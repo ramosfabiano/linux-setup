@@ -2,7 +2,7 @@
   
 An automated post-install script to set-up Ubuntu 24.04 LTS for my personal use.
 
-Tested with Ubuntu 24.04.1.
+Tested with Ubuntu 24.04.2.
 
 #### Installation
 
