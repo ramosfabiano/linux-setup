@@ -47,34 +47,23 @@ remove_mozilla_snaps() {
     apt remove firefox -y
 }
 
-install_mozilla_ppa() {
-    add-apt-repository ppa:mozillateam/ppa -y
-    echo '
-Package: *
-Pin: release o=LP-PPA-mozillateam
-Pin-Priority: 1001
-
-Package: thunderbird*
-Pin: release o=Ubuntu
-Pin-Priority: -1
-
-Package: firefox*
-Pin: release o=Ubuntu
-Pin-Priority: -1
-' > /etc/apt/preferences.d/mozilla
-    apt update
-    apt install firefox thunderbird -y
-}
-
-install_mozilla_official() {
+install_mozilla_apps() {
     apt install wget -y
+    # official mozilla
     install -d -m 0755 /etc/apt/keyrings
     wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | tee /etc/apt/keyrings/packages.mozilla.org.asc
     echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee -a /etc/apt/sources.list.d/mozilla.list
+     # mozilla team ppa, as a fallback
+    add-apt-repository ppa:mozillateam/ppa -y
+    # setup priorities
     echo '
 Package: *
 Pin: origin packages.mozilla.org
 Pin-Priority: 1001
+
+Package: thunderbird*
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1000
 
 Package: thunderbird*
 Pin: release o=Ubuntu
@@ -219,6 +208,7 @@ install_freeplane() {
     export FP_VERSION="1.12.9"
     wget https://sourceforge.net/projects/freeplane/files/freeplane%20stable/archive/$FP_VERSION/freeplane_$FP_VERSION~upstream-1_all.deb
     apt install openjdk-17-jdk ./freeplane_$FP_VERSION~upstream-1_all.deb -y
+    rm -f ./freeplane_$FP_VERSION~upstream-1_all.deb
 }
 
 install_qemu() {
@@ -333,8 +323,7 @@ auto() {
     msg 'Removing mozilla snaps'
     remove_mozilla_snaps
     msg 'Installing Firefox and Thunderbird (DEB)'
-    #install_mozilla_ppa
-    install_mozilla_official
+    install_mozilla_apps
     msg 'Setting up zram'
     setup_zram    
     msg 'Installing basic packages'
