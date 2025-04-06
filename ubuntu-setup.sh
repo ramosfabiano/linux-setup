@@ -12,6 +12,11 @@ remove_appcrash_popup() {
 remove_unattended_upgrades() {
     systemctl disable --now unattended-upgrades
     apt remove unattended-upgrades -y
+    echo '
+Package: unattended-upgrades
+Pin: release a=*
+Pin-Priority: -10
+' > /etc/apt/preferences.d/nounattended.pref
 }
 
 remove_snap_system() {
