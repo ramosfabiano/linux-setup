@@ -250,7 +250,6 @@ show_menu() {
     echo 'Choose what to do: '
     echo '1 - Run script.'
     echo '2 - Install OEM kernel.'
-    echo '3 - Remove snapd completely.'
     echo 'q - Exit'
     echo
 }
