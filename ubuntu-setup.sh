@@ -19,31 +19,6 @@ Pin-Priority: -10
 ' > /etc/apt/preferences.d/nounattended.pref
 }
 
-remove_snap_system() {
-    remove_unattended_upgrades
-    while [ "$(snap list | wc -l)" -gt 0 ]; do
-        for snap in $(snap list  | grep -v base$ | grep -v snapd$ | tail -n +2 | cut -d ' ' -f 1); do
-            snap remove --purge "$snap"
-        done
-        for snap in $(snap list  |  tail -n +2 | cut -d ' ' -f 1); do
-            snap remove --purge "$snap"
-        done
-    done
-    systemctl stop snapd
-    systemctl disable snapd
-    systemctl mask snapd
-    apt purge snapd -y
-    rm -rf /snap /var/snap /var/lib/snapd /var/cache/snapd /usr/lib/snapd
-    for userpath in /home/*; do
-        rm -rf $userpath/snap
-    done
-    echo '
-Package: snapd
-Pin: release a=*
-Pin-Priority: -10
-' > /etc/apt/preferences.d/nosnap.pref
-}
-
 remove_mozilla_snaps() {
     remove_unattended_upgrades
     snap remove --purge thunderbird
@@ -293,11 +268,6 @@ main() {
             ;;
         2)
             install_oem_kernel
-            msg 'Done!'
-            ask_reboot
-            ;;
-        3)
-            remove_snap_system
             msg 'Done!'
             ask_reboot
             ;;
