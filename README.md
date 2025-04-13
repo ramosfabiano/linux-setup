@@ -2,7 +2,7 @@
 
 Automated post-install scripts for personal use.
 
-These script are supposed to be run right after a fresh install.
+These scripts are supposed to be run right after a fresh install.
 
 *Note that these scripts are NOT idempotent.*
 
