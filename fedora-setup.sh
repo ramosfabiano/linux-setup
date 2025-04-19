@@ -33,13 +33,10 @@ setup_podman() {
 
 setup_docker() {
     dnf -y remove docker*
-
     dnf -y install dnf-plugins-core
     dnf-3 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
     dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
     systemctl enable --now docker
-
     # groupadd docker
     for userpath in /home/*; do
         usermod -a -G docker $(basename $userpath)
@@ -86,7 +83,7 @@ install_chrome() {
 }
 
 install_veracrypt() {
-    export VC_VERSION="1.26.14"
+    export VC_VERSION="1.26.20"
     cd /tmp
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm.sig

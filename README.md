@@ -17,7 +17,7 @@ Ubuntu 24.04.02 LTS.
 
 ## fedora-setup
   
-Fedora 41.
+Fedora 42.
 
 #### Installation
 
