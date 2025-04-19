@@ -49,7 +49,7 @@ setup_fonts() {
 }
 
 setup_flatpak() {
-    flatpak -y install com.github.tchx84.Flatseal
+    flatpak -y install fedora com.github.tchx84.Flatseal
     #flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 }
 
@@ -108,7 +108,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 }
 
 install_freeplane() {
-    flatpak -y install org.freeplane.App
+    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
