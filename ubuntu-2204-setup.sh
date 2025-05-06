@@ -202,8 +202,8 @@ auto() {
     update_system
     msg 'Removing mozilla snaps'
     remove_mozilla_snaps
-    msg 'Installing Firefox and Thunderbird (DEB)'
-    install_mozilla_apps
+    #msg 'Installing Firefox and Thunderbird (DEB)'
+    #install_mozilla_apps
     msg 'Setting up zram'
     setup_zram    
     msg 'Installing basic packages'
