@@ -1,12 +1,14 @@
 # Linux Setup
 
-Automated post-install scripts for personal use.
+Post-install setup scripts for personal use.
 
-These scripts should be run right after a fresh install.
 
-*Note that these scripts are NOT idempotent.*
+## Ubuntu 22.04.5 LTS.
 
-## Ubuntu 24.04.02 LTS.
+`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/ubuntu-2204-setup.sh) | tee log.txt"`
+
+
+## Ubuntu 24.04.2 LTS.
 
 `sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/ubuntu-2404-setup.sh) | tee log.txt"`
 
