@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-disable_ubuntu_report() {
-    ubuntu-report send no
-    apt remove ubuntu-report -y
-}
-
-remove_appcrash_popup() {
-    apt remove apport apport-gtk -y
-}
-
 remove_unattended_upgrades() {
     systemctl disable --now unattended-upgrades
     apt remove unattended-upgrades -y
@@ -63,10 +54,6 @@ update_system() {
 
 cleanup() {
     apt autoremove -y
-}
-
-install_oem_kernel() {
-    apt install linux-oem-24.04 -y
 }
 
 install_basic_packages() {
@@ -265,11 +252,6 @@ main() {
             msg 'Done!'
             ask_reboot
             ;;
-        2)
-            install_oem_kernel
-            msg 'Done!'
-            ask_reboot
-            ;;
         q)
             exit 0
             ;;
@@ -281,11 +263,7 @@ main() {
 
 }
 
-auto() {
-    msg 'Disabling ubuntu report'
-    disable_ubuntu_report
-    msg 'Removing annoying appcrash popup'
-    remove_appcrash_popup    
+auto() { 
     msg 'Updating system'
     update_system
     msg 'Removing unattended upgrades'
