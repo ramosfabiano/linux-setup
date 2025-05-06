@@ -12,7 +12,7 @@ Ubuntu 24.04.02 LTS.
 
 #### Installation
 
-`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/ubuntu-setup.sh) | tee log.txt"`
+`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/ubuntu-2404-setup.sh) | tee log.txt"`
 
 
 ## fedora-setup
@@ -21,4 +21,4 @@ Fedora 42.
 
 #### Installation
 
-`sudo bash -e -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-setup.sh) | tee log.txt"`
+`sudo bash -e -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-42-setup.sh) | tee log.txt"`
