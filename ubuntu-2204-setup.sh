@@ -18,6 +18,36 @@ remove_mozilla_snaps() {
     apt remove firefox -y
 }
 
+install_mozilla_apps() {
+    apt install wget -y
+    # official mozilla
+    install -d -m 0755 /etc/apt/keyrings
+    wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | tee /etc/apt/keyrings/packages.mozilla.org.asc
+    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee -a /etc/apt/sources.list.d/mozilla.list
+     # mozilla team ppa, as a fallback
+    add-apt-repository ppa:mozillateam/ppa -y
+    # setup priorities
+    echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1001
+
+Package: thunderbird*
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1000
+
+Package: thunderbird*
+Pin: release o=Ubuntu
+Pin-Priority: -1
+
+Package: firefox*
+Pin: release o=Ubuntu
+Pin-Priority: -1
+' > /etc/apt/preferences.d/mozilla
+    apt update
+    apt install firefox thunderbird -y
+}
+
 update_system() {
     apt update && apt upgrade -y
 }
@@ -172,6 +202,8 @@ auto() {
     update_system
     msg 'Removing mozilla snaps'
     remove_mozilla_snaps
+    msg 'Installing Firefox and Thunderbird (DEB)'
+    install_mozilla_apps
     msg 'Setting up zram'
     setup_zram    
     msg 'Installing basic packages'
