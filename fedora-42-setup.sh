@@ -19,7 +19,7 @@ install_basic_packages() {
         hplip hplip-gui cabextract lzip p7zip p7zip-plugins unrar \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra audacity
+        gdk-pixbuf2-modules-extra audacity chromium
 }
 
 install_extra_packages() {
