@@ -188,6 +188,14 @@ install_qemu() {
     done    
 }
 
+install_vbox() {
+    apt install virtualbox virtualbox-ext-pack -y
+    for userpath in /home/*; do
+        usermod -a -G vboxusers $(basename $userpath)
+    done    
+}
+
+
 setup_firewall() {
     apt install ufw gufw -y
     systemctl stop ssh.socket ssh
@@ -298,6 +306,8 @@ auto() {
     install_freeplane
     msg 'Install qemu'
     install_qemu
+    #msg 'Install vbox'
+    #install_vbox
     msg 'Cleaning up'
     cleanup
 }
