@@ -189,7 +189,7 @@ install_qemu() {
 }
 
 install_vbox() {
-    apt install virtualbox virtualbox-ext-pack -y
+    apt install binutils build-essential make dkms linux-headers-$(uname -r) linux-headers-generic virtualbox virtualbox-dkms virtualbox-ext-pack -y
     for userpath in /home/*; do
         usermod -a -G vboxusers $(basename $userpath)
     done    
