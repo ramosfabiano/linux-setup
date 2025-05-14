@@ -73,7 +73,9 @@ USB_EXCLUDE_BTUSB=1
 
 setup_firewall() {
     systemctl disable sshd
-    firewall-cmd --set-default-zone drop
+    firewall-cmd --set-default-zone public
+    firewall-cmd --permanent --remove-service=ssh
+    firewall-cmd --permanent --remove-service=dhcpv6-client
     firewall-cmd --reload
     firewall-cmd --list-all
 }
