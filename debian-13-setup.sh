@@ -47,7 +47,7 @@ install_extra_packages() {
         gnome-shell-extension-appindicator tigervnc-viewer dnsutils \
 	 	meld astyle inxi vlc texlive-extra-utils graphicsmagick-imagemagick-compat  \
         python3-pip pipx apt-transport-https ca-certificates curl wget \
-        fonts-liberation libu2f-udev libvulkan1 \
+        fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip keepassxc  synaptic default-jre audacity chromium -y
     apt install solaar -y # logi bolt
