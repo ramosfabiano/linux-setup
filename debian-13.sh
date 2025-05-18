@@ -20,13 +20,18 @@ Pin-Priority: -1
 ' > /etc/apt/preferences.d/mozilla
     apt update
     apt install firefox thunderbird -y
+    apt modernize-sources -y
 }
 
 update_system() {
-    apt update && apt upgrade -y
+    sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
+    apt update
+    apt upgrade -y
+    apt modernize-sources -y
 }
 
 cleanup() {
+    apt modernize-sources -y
     apt autoremove -y
 }
 
@@ -37,11 +42,11 @@ install_basic_packages() {
 }
 
 install_extra_packages() {
-    apt install ntp flatpak vim net-tools vim build-essential ffmpeg  rar unrar  \
-	 	p7zip-rar libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
+    apt install flatpak vim net-tools vim build-essential ffmpeg  \
+	 	libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
         gnome-shell-extension-appindicator tigervnc-viewer dnsutils \
 	 	meld astyle inxi vlc texlive-extra-utils graphicsmagick-imagemagick-compat  \
-        python3-pip pipx apt-transport-https ca-certificates curl software-properties-common wget \
+        python3-pip pipx apt-transport-https ca-certificates curl wget \
         fonts-liberation libu2f-udev libvulkan1 \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip keepassxc  synaptic default-jre audacity chromium -y
@@ -75,6 +80,16 @@ setup_zram() {
     apt install zram-tools -y
     echo -e "ALGO=zstd\nPERCENT=20" | tee -a /etc/default/zramswap
     systemctl restart zramswap
+    swapon -s
+    # disable regular swap
+    sed -i '/^\/dev\/mapper\/debian--vg-swap/s/^/#/' /etc/fstab
+    swapoff /dev/dm-1
+    echo
+    echo
+    cat /etc/fstab  | grep -v ^#
+    echo
+    echo
+    mount -a
     swapon -s
 }
 
