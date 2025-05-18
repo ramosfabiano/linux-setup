@@ -239,6 +239,8 @@ main() {
 }
 
 auto() { 
+    msg 'Setting up zram swap'
+    setup_zram    
     msg 'Setup sudo'
     setup_sudo
     msg 'Setup locale'
@@ -247,8 +249,6 @@ auto() {
     update_system
     msg 'Installing latest Firefox and Thunderbird (DEB)'
     install_mozilla_apps
-    msg 'Setting up zram'
-    setup_zram    
     msg 'Installing basic packages'
     install_basic_packages
     msg 'Setting up flathub'
