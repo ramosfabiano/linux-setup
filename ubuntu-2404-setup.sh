@@ -188,14 +188,6 @@ install_qemu() {
     done    
 }
 
-install_vbox() {
-    apt install binutils build-essential make dkms linux-headers-$(uname -r) linux-headers-generic virtualbox virtualbox-dkms virtualbox-ext-pack -y
-    for userpath in /home/*; do
-        usermod -a -G vboxusers $(basename $userpath)
-    done    
-}
-
-
 setup_firewall() {
     apt install ufw gufw -y
     systemctl stop ssh.socket ssh
@@ -283,31 +275,29 @@ auto() {
     setup_zram    
     msg 'Installing basic packages'
     install_basic_packages
-    msg 'Setting up flathub'
-    setup_flathub    
+    #msg 'Setting up flathub'
+    #setup_flathub    
     msg 'Setting up TLP'
     setup_tlp
     msg 'Setting up firewall'
     setup_firewall
     msg 'Installing extra packages'
     install_extra_packages
-    msg 'Setup containers'
+    #msg 'Setup containers'
     #setup_podman
-    setup_docker
+    #setup_docker
     msg 'Install MS fonts'
     setup_fonts
-    #msg 'Install chrome'
-    #install_chrome
-    msg 'Install veracrypt'
-    install_veracrypt
-    msg 'Install code'
-    install_vscode
-    msg 'Install freeplane'
-    install_freeplane
-    msg 'Install qemu'
-    install_qemu
-    #msg 'Install vbox'
-    #install_vbox
+    msg 'Install chrome'
+    install_chrome
+    #msg 'Install veracrypt'
+    #install_veracrypt
+    #msg 'Install code'
+    #install_vscode
+    #msg 'Install freeplane'
+    #install_freeplane
+    #msg 'Install qemu'
+    #install_qemu
     msg 'Cleaning up'
     cleanup
 }
