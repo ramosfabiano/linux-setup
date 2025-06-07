@@ -207,8 +207,8 @@ auto() {
     msg 'Installing extra packages'
     install_extra_packages   
     msg 'Setup containers'
-    #setup_podman
-    setup_docker
+    setup_podman
+    #setup_docker
     msg 'Setting up flatpak'
     setup_flatpak    
     msg 'Setting up TLP'
