@@ -98,9 +98,11 @@ disable_smart_card() {
 }
 
 install_qemu() {
-    dnf -y install bridge-utils libvirt virt-install qemu-kvm virt-viewer virt-manager spice-webdavd spice-gtk-tools swtpm.x86_64 edk2-ovmf  
+    # still required?
     sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
     setenforce 0
+
+    dnf -y install bridge-utils libvirt virt-install qemu-kvm virt-viewer virt-manager spice-webdavd spice-gtk-tools swtpm.x86_64 edk2-ovmf  
     for userpath in /home/*; do
         usermod -a -G libvirt,kvm $(basename $userpath)
     done
