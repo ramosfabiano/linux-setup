@@ -45,6 +45,7 @@ install_extra_packages_flatpak() {
     flatpak -y install flathub org.keepassxc.KeePassXC 
     flatpak -y install flathub io.github.pwr_solaar.solaar
     flatpak -y install flathub org.freeplane.App
+    flatpak -y install flathub org.libreoffice.LibreOffice
 }
 
 setup_firefox() {
