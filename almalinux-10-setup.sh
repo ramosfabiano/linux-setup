@@ -83,7 +83,7 @@ install_veracrypt() {
 
 install_vscode() {
     # still required? MS key still uses SHA-1?
-    update-crypto-policies --set LEGACY 
+    update-crypto-policies --set DEFAULT:SHA1 
     
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     echo '
