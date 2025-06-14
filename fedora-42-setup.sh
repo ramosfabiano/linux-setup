@@ -43,6 +43,11 @@ install_extra_packages_flatpak() {
     flatpak -y install flathub org.freeplane.App
 }
 
+setup_firefox() {
+    dnf -y remove firefox  # ESR version
+    flatpak -y install flathub org.mozilla.firefox
+}
+
 setup_podman() {
     dnf -y install podman podman-compose podman-docker 
 }
@@ -187,6 +192,8 @@ auto() {
     msg 'Setting up flatpak'
     setup_flatpak
     install_extra_packages_flatpak
+    msg 'Setup firefox'
+    setup_firefox
     msg 'Setup containers'
     setup_podman
     msg 'Setting up firewall'
