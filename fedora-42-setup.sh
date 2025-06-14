@@ -24,7 +24,11 @@ install_basic_packages() {
 
 install_extra_packages() {
     dnf -y install amrnb amrwb faad2 flac gpac-libs lame libde265 libfc14audiodecoder mencoder x264 x265 --allowerasing
-    dnf -y install solaar  # logi bolt
+    dnf -y install ffmpeg-libs libva libva-utils
+    dnf -y libva-intel-media-driver intel-media-driver --allowerasing
+    dnf -y install libva-intel-driver  
+    # logi bolt
+    dnf -y install solaar    
 }
 
 setup_podman() {
@@ -68,12 +72,8 @@ setup_firewall() {
     firewall-cmd --list-all
 }
 
-install_chrome() {
-    dnf -y install google-chrome-stable
-}
-
 install_veracrypt() {
-    export VC_VERSION="1.26.20"
+    export VC_VERSION="1.26.24"
     cd /tmp
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm.sig
@@ -198,14 +198,12 @@ auto() {
     setup_podman
     msg 'Setting up flatpak'
     setup_flatpak    
-    msg 'Setting up TLP'
-    setup_tlp
+    #msg 'Setting up TLP'   # replaced by tuned
+    #setup_tlp
     msg 'Setting up firewall'
     setup_firewall
     msg 'Install MS fonts'
     setup_fonts
-    #msg 'Install chrome'
-    #install_chrome
     msg 'Install veracrypt'
     install_veracrypt
     msg 'Install code'
