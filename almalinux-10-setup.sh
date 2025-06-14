@@ -183,11 +183,12 @@ auto() {
     msg 'Installing basic packages'
     install_basic_packages
     msg 'Installing extra packages'
-    install_extra_packages   
-    msg 'Setup containers'
-    setup_podman
+    install_extra_packages
     msg 'Setting up flatpak'
-    setup_flatpak    
+    setup_flatpak   
+    install_extra_packages_flatpak
+    msg 'Setup containers'
+    setup_podman  
     msg 'Setting up firewall'
     setup_firewall
     msg 'Install MS fonts'

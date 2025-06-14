@@ -10,25 +10,36 @@ install_rpmfusion() {
     dnf -y update
 }
 
+setup_flatpak() {
+    flatpak -y install fedora com.github.tchx84.Flatseal
+    #flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}
+
 install_basic_packages() {
-    dnf -y install flatpak vim filezilla thunderbird tigervnc git meld gimp \
+    dnf -y install flatpak vim filezilla thunderbird tigervnc git meld  \
         vlc cmake gcc-c++ boost-devel flatpak thunderbird vim unrar  \
         tigervnc dnsutils java-latest-openjdk astyle  \
         containernetworking-plugins meld thermald curl wget liberation*fonts* \
-        python3-pip pipx xsel inxi vlc keepassxc firewall-config gnome-icon-theme \
+        python3-pip pipx xsel inxi vlc firewall-config gnome-icon-theme \
         hplip hplip-gui cabextract lzip p7zip p7zip-plugins unrar \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra audacity chromium v4l-utils
+        gdk-pixbuf2-modules-extra chromium v4l-utils
 }
 
 install_extra_packages() {
     dnf -y install amrnb amrwb faad2 flac gpac-libs lame libde265 libfc14audiodecoder mencoder x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva libva-utils
     dnf -y libva-intel-media-driver intel-media-driver --allowerasing
-    dnf -y install libva-intel-driver  
-    # logi bolt
-    dnf -y install solaar    
+    dnf -y install libva-intel-driver
+}
+
+install_extra_packages_flatpak() {
+    flatpak -y install flathub org.gimp.GIMP
+    flatpak -y install flathub org.audacityteam.Audacity 
+    flatpak -y install flathub org.keepassxc.KeePassXC 
+    flatpak -y install flathub io.github.pwr_solaar.solaar
+    flatpak -y install flathub org.freeplane.App
 }
 
 setup_podman() {
@@ -38,29 +49,6 @@ setup_podman() {
 setup_fonts() {
     dnf -y install curl cabextract xorg-x11-font-utils fontconfig
     rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
-}
-
-setup_flatpak() {
-    flatpak -y install fedora com.github.tchx84.Flatseal
-    #flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-}
-
-setup_tlp() {
-    dnf -y install tlp tlp-rdw smartmontools
-    dnf -y remove power-profiles-daemon
-    echo '
-TLP_ENABLE=1
-CPU_SCALING_GOVERNOR_ON_BAT=powersave
-RESTORE_THRESHOLDS_ON_BAT=1
-USB_AUTOSUSPEND=0
-USB_EXCLUDE_AUDIO=1
-USB_EXCLUDE_PHONE=1
-USB_EXCLUDE_BTUSB=1
-' > /etc/tlp.conf 
-    systemctl enable tlp.service
-    systemctl start tlp.service
-    systemctl mask systemd-rfkill.service systemd-rfkill.socket
-    tlp-stat -s
 }
 
 setup_firewall() {
@@ -95,10 +83,6 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 ' > /etc/yum.repos.d/vscode.repo
     dnf -y install code
-}
-
-install_freeplane() {
-    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
@@ -193,13 +177,12 @@ auto() {
     msg 'Installing basic packages'
     install_basic_packages
     msg 'Installing extra packages'
-    install_extra_packages   
-    msg 'Setup containers'
-    setup_podman
+    install_extra_packages
     msg 'Setting up flatpak'
-    setup_flatpak    
-    #msg 'Setting up TLP'   # replaced by tuned
-    #setup_tlp
+    setup_flatpak
+    install_extra_packages_flatpak
+    msg 'Setup containers'
+    setup_podman 
     msg 'Setting up firewall'
     setup_firewall
     msg 'Install MS fonts'
@@ -208,8 +191,6 @@ auto() {
     install_veracrypt
     msg 'Install code'
     install_vscode
-    msg 'Install freeplane'
-    install_freeplane
     msg 'Disable smart card'
     disable_smart_card
     msg 'Install qemu'
