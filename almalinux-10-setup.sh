@@ -42,6 +42,7 @@ install_extra_packages() {
 
 install_extra_packages_flatpak() {
     # TODO: keepassxc gimp audacity filezilla meld tigervnc hplip-gui solaar
+    echo "TODO"
 }
 
 setup_podman() {
