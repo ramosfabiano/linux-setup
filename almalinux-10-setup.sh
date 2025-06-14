@@ -40,7 +40,11 @@ install_extra_packages() {
 }
 
 install_extra_packages_flatpak() {
-    flatpak -y install org.gimp.GIMP org.audacityteam.Audacity org.keepassxc.KeePassXC io.github.pwr_solaar.solaar
+    flatpak -y install flathub org.gimp.GIMP
+    flatpak -y install flathub org.audacityteam.Audacity 
+    flatpak -y install flathub org.keepassxc.KeePassXC 
+    flatpak -y install flathub io.github.pwr_solaar.solaar
+    flatpak -y install flathub org.freeplane.App
 }
 
 setup_podman() {
@@ -89,10 +93,6 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 ' > /etc/yum.repos.d/vscode.repo
     dnf -y install code
-}
-
-install_freeplane() {
-    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
@@ -196,8 +196,6 @@ auto() {
     install_veracrypt
     msg 'Install code'
     install_vscode
-    msg 'Install freeplane'
-    install_freeplane
     msg 'Disable smart card'
     disable_smart_card
     msg 'Install qemu'
