@@ -8,7 +8,6 @@ install_external_repos() {
     # el repo
     dnf config-manager --set-enabled crb
     dnf -y install elrepo-release
-    /usr/bin/crb enable
     # rpm fusion
     dnf -y install https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm 
     dnf -y install https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm
