@@ -4,34 +4,35 @@ update_system() {
     dnf -y update
 }
 
-install_rpmfusion() {
+install_external_repos() {
     dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
     dnf -y install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    # update
     dnf -y update
 }
 
 setup_flatpak() {
-    flatpak -y install fedora com.github.tchx84.Flatseal
-    #flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak -y install com.github.tchx84.Flatseal
 }
 
 install_basic_packages() {
-    dnf -y install flatpak vim filezilla thunderbird tigervnc git meld  \
-        vlc cmake gcc-c++ boost-devel flatpak thunderbird vim unrar  \
-        tigervnc dnsutils java-latest-openjdk astyle  \
-        containernetworking-plugins meld thermald curl wget liberation*fonts* \
-        python3-pip pipx xsel inxi vlc firewall-config gnome-icon-theme \
-        hplip hplip-gui cabextract lzip p7zip p7zip-plugins unrar \
+    dnf -y install flatpak vim thunderbird git \
+        vlc cmake gcc-c++ boost-devel flatpak thunderbird vim  \
+        dnsutils java-latest-openjdk astyle  \
+        thermald curl wget liberation*fonts* \
+        python3-pip pipx xsel firewall-config \
+        hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra chromium v4l-utils
+        gdk-pixbuf2-modules-extra chromium
 }
 
 install_extra_packages() {
-    dnf -y install amrnb amrwb faad2 flac gpac-libs lame libde265 libfc14audiodecoder mencoder x264 x265 --allowerasing
-    dnf -y install ffmpeg-libs libva libva-utils
-    dnf -y libva-intel-media-driver intel-media-driver --allowerasing
-    dnf -y install libva-intel-driver
+    dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
+    dnf -y install ffmpeg-libs libva 
+    dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
+    dnf -y install libva-intel-driver    
 }
 
 install_extra_packages_flatpak() {
@@ -43,7 +44,7 @@ install_extra_packages_flatpak() {
 }
 
 setup_podman() {
-    dnf -y install podman podman-compose podman-docker
+    dnf -y install podman podman-compose podman-docker 
 }
 
 setup_fonts() {
@@ -56,9 +57,12 @@ setup_firewall() {
     firewall-cmd --set-default-zone public
     firewall-cmd --permanent --remove-service=ssh
     firewall-cmd --permanent --remove-service=dhcpv6-client
+    firewall-cmd --permanent --remove-service=cockpit
+    firewall-cmd --permanent --add-service=mdns
     firewall-cmd --reload
     firewall-cmd --list-all
 }
+
 
 install_veracrypt() {
     export VC_VERSION="1.26.24"
@@ -71,6 +75,7 @@ install_veracrypt() {
     sudo dnf -y install ./veracrypt*.rpm
     rm -f VeraCrypt* veracrypt*  
 }
+
 
 install_vscode() {
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -98,10 +103,9 @@ install_qemu() {
     setenforce 0
     for userpath in /home/*; do
         usermod -a -G libvirt,kvm $(basename $userpath)
-    done    
-}
-
-fix_libvirt_network() {
+    done
+    
+    # still required?
     echo "firewall_backend  = \"iptables\"" >> /etc/libvirt/network.conf
 }
 
@@ -172,8 +176,8 @@ main() {
 auto() {
     msg 'Updating system'
     update_system
-    msg 'Install rpmfusion'
-    install_rpmfusion
+    msg 'Install external repos'
+    install_external_repos
     msg 'Installing basic packages'
     install_basic_packages
     msg 'Installing extra packages'
@@ -182,7 +186,7 @@ auto() {
     setup_flatpak
     install_extra_packages_flatpak
     msg 'Setup containers'
-    setup_podman 
+    setup_podman
     msg 'Setting up firewall'
     setup_firewall
     msg 'Install MS fonts'
@@ -195,8 +199,6 @@ auto() {
     disable_smart_card
     msg 'Install qemu'
     install_qemu
-    msg 'Libvirt network fix'
-    fix_libvirt_network
 }
 
 (return 2> /dev/null) || main

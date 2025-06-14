@@ -17,7 +17,7 @@ install_external_repos() {
 
 setup_flatpak() {
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    flatpak -y install com.github.tchx84.Flatseal    
+    flatpak -y install com.github.tchx84.Flatseal
 }
 
 install_basic_packages() {
@@ -26,7 +26,7 @@ install_basic_packages() {
         dnsutils java-latest-openjdk astyle  \
         thermald curl wget liberation*fonts* \
         python3-pip pipx xsel firewall-config \
-        hplip cabextract lzip p7zip p7zip-plugins \
+        hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
         gdk-pixbuf2-modules-extra chromium
@@ -82,7 +82,9 @@ install_veracrypt() {
 
 
 install_vscode() {
-    update-crypto-policies --set LEGACY  # MS key still uses SHA-1
+    # still required? MS key still uses SHA-1?
+    update-crypto-policies --set LEGACY 
+    
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     echo '
 [code]
@@ -108,7 +110,7 @@ install_qemu() {
     setenforce 0
     for userpath in /home/*; do
         usermod -a -G libvirt,kvm $(basename $userpath)
-    done    
+    done
 }
 
 ask_reboot() {
@@ -185,10 +187,10 @@ auto() {
     msg 'Installing extra packages'
     install_extra_packages
     msg 'Setting up flatpak'
-    setup_flatpak   
+    setup_flatpak
     install_extra_packages_flatpak
     msg 'Setup containers'
-    setup_podman  
+    setup_podman
     msg 'Setting up firewall'
     setup_firewall
     msg 'Install MS fonts'
