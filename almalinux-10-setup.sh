@@ -35,7 +35,7 @@ install_basic_packages() {
 install_extra_packages() {
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva 
-    dnf -y libva-intel-media-driver intel-media-driver --allowerasing
+    dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
     dnf -y install libva-intel-driver    
 }
 
