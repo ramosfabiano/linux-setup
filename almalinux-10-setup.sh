@@ -83,6 +83,7 @@ install_veracrypt() {
 
 install_vscode() {
     # still required? MS key still uses SHA-1?
+    # https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/security_hardening/using-system-wide-cryptographic-policies
     update-crypto-policies --set LEGACY 
     
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
