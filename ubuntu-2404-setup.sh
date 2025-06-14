@@ -69,41 +69,9 @@ install_extra_packages() {
         python3-pip pipx apt-transport-https ca-certificates curl software-properties-common wget \
         fonts-liberation libu2f-udev libvulkan1 \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
-        hplip keepassxc  synaptic default-jre audacity -y
+        hplip keepassxc  synaptic default-jre audacity chromium -y
     apt install solaar -y # logi bolt
 }
-
-setup_podman() {
-    apt install podman podman-docker podman-compose -y
-    echo '
-unqualified-search-registries = ["docker.io"]
-' >> /etc/containers/registries.conf
-}
-
-setup_docker() {
-    apt-get remove docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc -y
-    apt-get update -y
-    apt-get install ca-certificates curl -y
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
-
-    echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
-    apt-get update -y
-
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-
-    systemctl enable --now docker
-
-    # groupadd docker
-    for userpath in /home/*; do
-        usermod -a -G docker $(basename $userpath)
-    done 
-}
-
 
 setup_fonts() {
     echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections    
@@ -139,53 +107,6 @@ USB_EXCLUDE_BTUSB=1
     systemctl start tlp.service
     systemctl mask systemd-rfkill.service systemd-rfkill.socket
     tlp-stat -s
-}
-
-install_chrome() {
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    apt install ./google-chrome-stable_current_amd64.deb -y
-    rm -f google-chrome-stable_current_amd64.deb
-}
-
-install_veracrypt() {
-    export VC_VERSION="1.26.20"
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb.sig
-    wget https://www.idrix.fr/VeraCrypt/VeraCrypt_PGP_public_key.asc
-    gpg --import VeraCrypt_PGP_public_key.asc
-    gpg --verify veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb.sig
-    apt install ./veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb -y
-    rm -f veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb
-    rm -f veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb.sig
-    rm -f VeraCrypt_PGP_public_key.asc
-    rm -f VeraCrypt_PGP_public_key.asc.1   
-}
-
-install_vscode() {
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-    install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-    sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-    rm -f packages.microsoft.gpg
-    apt update -y
-    apt install code -y
-}
-
-install_freeplane() {
-    flatpak -y install org.freeplane.App
-}
-
-install_qemu() {
-    systemctl stop pcscd.socket
-    systemctl stop pcscd
-    systemctl disable pcscd
-    systemctl mask pcscd
-    apt install qemu-system qemu-kvm libvirt-daemon libvirt-clients bridge-utils virt-manager libvirt-daemon-system \
-        virtinst qemu-utils virt-viewer spice-client-gtk gir1.2-spice* ebtables swtpm swtpm-tools ovmf virtiofsd -y
-    virsh net-autostart default
-    modprobe vhost_net    
-    for userpath in /home/*; do
-        usermod -a -G libvirt,kvm $(basename $userpath)
-    done    
 }
 
 setup_firewall() {
@@ -275,29 +196,16 @@ auto() {
     setup_zram    
     msg 'Installing basic packages'
     install_basic_packages
-    #msg 'Setting up flathub'
-    #setup_flathub    
+    msg 'Setting up flathub'
+    setup_flathub    
     msg 'Setting up TLP'
     setup_tlp
     msg 'Setting up firewall'
     setup_firewall
     msg 'Installing extra packages'
     install_extra_packages
-    #msg 'Setup containers'
-    #setup_podman
-    #setup_docker
     msg 'Install MS fonts'
     setup_fonts
-    #msg 'Install chrome'
-    #install_chrome
-    #msg 'Install veracrypt'
-    #install_veracrypt
-    #msg 'Install code'
-    #install_vscode
-    #msg 'Install freeplane'
-    #install_freeplane
-    #msg 'Install qemu'
-    #install_qemu
     msg 'Cleaning up'
     cleanup
 }
