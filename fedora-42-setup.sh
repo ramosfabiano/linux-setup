@@ -44,7 +44,7 @@ install_extra_packages_flatpak() {
 }
 
 setup_firefox() {
-    dnf -y remove firefox  # ESR version
+    dnf -y remove firefox
     flatpak -y install flathub org.mozilla.firefox
 }
 
