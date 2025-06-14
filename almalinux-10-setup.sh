@@ -40,8 +40,7 @@ install_extra_packages() {
 }
 
 install_extra_packages_flatpak() {
-    # TODO: keepassxc gimp audacity filezilla meld tigervnc hplip-gui solaar
-    echo "TODO"
+    flatpak -y install org.gimp.GIMP org.audacityteam.Audacity org.keepassxc.KeePassXC io.github.pwr_solaar.solaar
 }
 
 setup_podman() {
