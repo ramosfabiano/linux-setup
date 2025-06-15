@@ -26,6 +26,8 @@ install_basic_packages() {
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
         gdk-pixbuf2-modules-extra chromium
+
+    dnf -y remove libreoffice*
 }
 
 install_extra_packages() {
@@ -41,6 +43,7 @@ install_extra_packages_flatpak() {
     flatpak -y install flathub org.keepassxc.KeePassXC 
     flatpak -y install flathub io.github.pwr_solaar.solaar
     flatpak -y install flathub org.freeplane.App
+    flatpak -y install flathub org.libreoffice.LibreOffice
 }
 
 setup_firefox() {
