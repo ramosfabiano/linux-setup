@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
 setup_zram() {
-    echo "TODO: add ZRAM."
+    dnf -y install zram-generator
+    echo '
+[zram0]
+zram-size = min(ram / 2, 4096)
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
+' > /etc/systemd/zram-generator.conf
+    systemctl daemon-reload
+    systemctl start /dev/zram0
+    zramctl
+    swapon -s
 }
 
 update_system() {
