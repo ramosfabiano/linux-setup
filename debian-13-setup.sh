@@ -49,9 +49,6 @@ install_basic_packages() {
     apt install ntp vim net-tools rsync openssh-server -y
     apt install --install-suggests gnome-software -y
     apt install intel-microcode firmware-linux firmware-linux-nonfree firmware-misc-nonfree dkms -y
-
-    apt -y remove libreoffice*
-    apt -y autoremove
 }
 
 install_extra_packages() {
@@ -71,7 +68,7 @@ install_extra_packages_flatpak() {
     flatpak -y install flathub org.keepassxc.KeePassXC 
     flatpak -y install flathub io.github.pwr_solaar.solaar
     flatpak -y install flathub org.freeplane.App
-    flatpak -y install flathub org.libreoffice.LibreOffice
+    #flatpak -y install flathub org.libreoffice.LibreOffice
 }
 
 setup_firefox() {
