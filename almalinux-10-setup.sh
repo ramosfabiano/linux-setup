@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+setup_swap() {
+    dd if=/dev/zero of=/swapfile bs=1G count=8
+    mkswap /swapfile
+    chmod 0600 /swapfile
+    echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+    systemctl daemon-reload
+    swapon /swapfile
+    swapon -s 
+    free -h
+}
+
 update_system() {
     dnf -y update
 }
@@ -187,6 +198,8 @@ main() {
 }
 
 auto() {
+    msg 'Setting up swap'
+    setup_swap 
     msg 'Updating system'
     update_system
     msg 'Install external repos'
