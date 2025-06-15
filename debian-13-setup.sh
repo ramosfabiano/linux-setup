@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-setup_swap() {
+setup_zram() {
     apt install zram-tools -y
     echo -e "ALGO=zstd\nPERCENT=20" | tee -a /etc/default/zramswap
     systemctl restart zramswap
@@ -212,7 +212,7 @@ main() {
 
 auto() {
     msg 'Setting up swap'
-    setup_swap    
+    setup_zram    
     msg 'Setup sudo'
     setup_sudo
     msg 'Setup locale'

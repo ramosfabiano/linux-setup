@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-setup_swap() {
+setup_zram() {
     echo 'ZRAM is setup by default in Fedora.'
 }
 
@@ -189,7 +189,7 @@ main() {
 
 auto() {
     msg 'Setting up swap'
-    setup_swap 
+    setup_zram 
     msg 'Updating system'
     update_system
     msg 'Install external repos'
