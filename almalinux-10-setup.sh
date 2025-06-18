@@ -35,6 +35,10 @@ setup_flatpak() {
     flatpak -y install com.github.tchx84.Flatseal
 }
 
+remove_unwanted_packages() {
+    echo 'No unwanted packages to remove.'
+}
+
 install_basic_packages() {
     dnf -y install flatpak vim thunderbird git \
         vlc cmake gcc-c++ boost-devel flatpak thunderbird vim  \
@@ -204,6 +208,8 @@ main() {
 auto() {
     msg 'Setting up swap'
     setup_zram 
+    msg 'Removing unwanted packages'
+    remove_unwanted_packages
     msg 'Updating system'
     update_system
     msg 'Install external repos'
