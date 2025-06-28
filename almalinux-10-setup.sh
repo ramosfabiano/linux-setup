@@ -48,7 +48,7 @@ install_basic_packages() {
         hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra chromium
+        gdk-pixbuf2-modules-extra chromium ntfs-3g
 }
 
 install_extra_packages() {
