@@ -32,7 +32,7 @@ update_system() {
     sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
-    apt modernize-sources -y
+    #apt modernize-sources -y
 }
 
 install_external_repos() {
@@ -47,8 +47,8 @@ setup_flatpak() {
 
 remove_unwanted_packages() {
     apt remove -y libreoffice-*
-    apt autoremove
-    apt autoclean 
+    apt autoremove -y
+    apt autoclean -y
 }
 
 install_basic_packages() {
