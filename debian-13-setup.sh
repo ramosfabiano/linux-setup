@@ -47,7 +47,6 @@ setup_flatpak() {
 }
 
 remove_unwanted_packages() {
-    apt remove -y libreoffice-*
     apt autoremove -y
     apt autoclean -y
 }
@@ -67,14 +66,11 @@ install_extra_packages() {
         fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip synaptic default-jre chromium thunderbird solaar -y
+    apt install gimp audacity keepassxc -y
 }
 
 install_extra_packages_flatpak() {
-    flatpak -y install flathub org.gimp.GIMP
-    flatpak -y install flathub org.audacityteam.Audacity 
-    flatpak -y install flathub org.keepassxc.KeePassXC 
     flatpak -y install flathub org.freeplane.App
-    flatpak -y install flathub org.libreoffice.LibreOffice
 }
 
 setup_firefox() {
