@@ -102,6 +102,7 @@ setup_firewall() {
     ufw enable    
     ufw default deny incoming
     ufw default allow outgoing
+    #ufw allow mdns
     ufw status verbose
 }
 
