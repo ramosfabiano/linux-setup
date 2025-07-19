@@ -2,7 +2,7 @@
 
 setup_zram() {
     apt install zram-tools -y
-    echo -e "ALGO=zstd\nPERCENT=20" | tee -a /etc/default/zramswap
+    echo -e "ALGO=zstd\nPERCENT=15" | tee -a /etc/default/zramswap
     systemctl restart zramswap
     swapon -s
     # disable regular swap
