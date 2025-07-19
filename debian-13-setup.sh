@@ -29,10 +29,11 @@ setup_locale() {
 }
 
 update_system() {
+    apt modernize-sources -y
+    rm -f /etc/apt/sources.list.d/moved-from-main.sources
     sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
-    #apt modernize-sources -y
 }
 
 install_external_repos() {
@@ -52,7 +53,7 @@ remove_unwanted_packages() {
 }
 
 install_basic_packages() {
-    apt install ntp vim net-tools rsync openssh-server -y
+    apt install openntpd vim net-tools rsync openssh-server -y
     apt install --install-suggests gnome-software -y
     apt install intel-microcode firmware-linux firmware-linux-nonfree firmware-misc-nonfree dkms -y
 }
