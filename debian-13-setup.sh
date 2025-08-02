@@ -80,7 +80,7 @@ setup_podman() {
     apt install podman podman-compose podman-docker -y
     echo '
 [registries.search]
-registries = ["docker.io", "registry.fedoraproject.org", "registry.access.redhat.com"]
+registries = ["docker.io"]
 [registries.insecure]
 registries = []
 [registries.block]
