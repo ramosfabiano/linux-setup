@@ -29,8 +29,6 @@ setup_locale() {
 }
 
 update_system() {
-    apt modernize-sources -y
-    rm -f /etc/apt/sources.list.d/moved-from-main.sources
     sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
@@ -65,8 +63,8 @@ install_extra_packages() {
         python3-pip pipx apt-transport-https ca-certificates curl wget \
         fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
-        hplip synaptic default-jre chromium thunderbird solaar -y
-    apt install gimp audacity keepassxc -y
+        hplip synaptic default-jre chromium thunderbird solaar \
+        gimp audacity keepassxc -y
 }
 
 install_extra_packages_flatpak() {
@@ -99,10 +97,10 @@ setup_firewall() {
     apt install ufw gufw -y
     systemctl stop ssh.socket ssh
     systemctl disable ssh
-    ufw enable    
+    ufw enable
     ufw default deny incoming
     ufw default allow outgoing
-    #ufw allow mdns
+    ufw allow mdns
     ufw status verbose
 }
 
