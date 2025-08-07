@@ -59,10 +59,6 @@ install_extra_packages() {
         gimp audacity keepassxc yt-dlp -y
 }
 
-install_extra_packages_flatpak() {
-    flatpak -y install flathub org.freeplane.App
-}
-
 setup_firefox() {
     apt remove firefox-esr -y
     flatpak -y install flathub org.mozilla.firefox
@@ -125,6 +121,10 @@ Signed-By: /usr/share/keyrings/microsoft.gpg
 ' > /etc/apt/sources.list.d/vscode.sources
     apt update -y
     apt install code -y
+}
+
+install_freeplane() {
+    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
@@ -223,7 +223,6 @@ auto() {
     install_extra_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    install_extra_packages_flatpak
     msg 'Setup firefox'
     setup_firefox
     msg 'Setup containers'
@@ -236,6 +235,8 @@ auto() {
     install_veracrypt
     msg 'Install code'
     install_vscode
+    msg 'Install freeplane'
+    install_freeplane
     msg 'Disable smart card'
     disable_smart_card
     msg 'Install qemu'
