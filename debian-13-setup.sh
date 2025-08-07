@@ -61,7 +61,7 @@ install_extra_packages() {
         fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip synaptic default-jre chromium thunderbird solaar \
-        gimp audacity keepassxc -y
+        gimp audacity keepassxc yt-dlp -y
 }
 
 install_extra_packages_flatpak() {
