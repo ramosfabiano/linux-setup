@@ -41,11 +41,6 @@ setup_flatpak() {
     flatpak -y install com.github.tchx84.Flatseal
 }
 
-remove_unwanted_packages() {
-    apt autoremove -y
-    apt autoclean -y
-}
-
 install_basic_packages() {
     apt install openntpd vim net-tools rsync openssh-server -y
     apt install --install-suggests gnome-software -y
@@ -218,8 +213,6 @@ auto() {
     setup_zram    
     msg 'Setup locale'
     setup_locale
-    msg 'Removing unwanted packages'
-    remove_unwanted_packages
     msg 'Updating system'
     update_system
     msg 'Install external repos'
