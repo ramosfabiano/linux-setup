@@ -18,13 +18,21 @@ setup_locale() {
 }
 
 update_system() {
+    apt modernize-sources -y
     sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
 }
 
 install_external_repos() {
-    echo "TODO: add backports"
+    echo '
+Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: trixie-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+' > /etc/apt/sources.list.d/trixie-backports.sources
+    apt update
 }
 
 setup_flatpak() {
