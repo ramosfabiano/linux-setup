@@ -24,7 +24,7 @@ update_system() {
     apt upgrade -y
 }
 
-install_external_repos() {
+install_backports_repo() {
     echo '
 Types: deb deb-src
 URIs: http://deb.debian.org/debian
@@ -211,35 +211,35 @@ main() {
 auto() {
     msg 'Setting up swap'
     setup_zram    
-    msg 'Setup locale'
+    msg 'Setting up locale'
     setup_locale
     msg 'Updating system'
     update_system
-    msg 'Install external repos'
-    install_external_repos
+    msg 'Installing backports repo'
+    install_backports_repo
     msg 'Installing basic packages'
     install_basic_packages
     msg 'Installing extra packages'
     install_extra_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setup firefox'
+    msg 'Setting up firefox'
     setup_firefox
-    msg 'Setup containers'
+    msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
     setup_firewall
-    msg 'Install MS fonts'
+    msg 'Installing MS fonts'
     setup_fonts
-    msg 'Install veracrypt'
+    msg 'Installing veracrypt'
     install_veracrypt
-    msg 'Install code'
+    msg 'Installing code'
     install_vscode
-    msg 'Install freeplane'
+    msg 'Installing freeplane'
     install_freeplane
-    msg 'Disable smart card'
+    msg 'Disabling smart card'
     disable_smart_card
-    msg 'Install qemu'
+    msg 'Installing qemu'
     install_qemu
 }
 
