@@ -6,21 +6,10 @@ setup_zram() {
     systemctl restart zramswap
     swapon -s
     # disable regular swap
-    sed -i '/^\/dev\/mapper\/debian--vg-swap/s/^/#/' /etc/fstab
-    swapoff /dev/dm-1
-    echo
-    echo
-    cat /etc/fstab  | grep -v ^#
-    echo
-    echo
+    sed -i '/^\/dev\/mapper\/.*vg-swap/s/^/#/' /etc/fstab
+    swapoff /dev/dm-2
     mount -a
     swapon -s
-}
-
-setup_sudo() {
-    for userpath in /home/*; do
-        /usr/sbin/usermod -a -G sudo $(basename $userpath)
-    done    
 }
 
 setup_locale() {
@@ -211,8 +200,6 @@ main() {
 auto() {
     msg 'Setting up swap'
     setup_zram    
-    msg 'Setup sudo'
-    setup_sudo
     msg 'Setup locale'
     setup_locale
     msg 'Removing unwanted packages'
