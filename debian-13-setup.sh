@@ -77,6 +77,7 @@ registries = []
 setup_fonts() {
     echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections    
     apt install ttf-mscorefonts-installer -y
+    apt install fonts-ubuntu* -y
 }
 
 setup_firewall() {
