@@ -5,7 +5,6 @@ setup_zram() {
     echo -e "ALGO=zstd\nPERCENT=15" | tee -a /etc/default/zramswap
     systemctl restart zramswap
     swapon -s
-    # disable regular swap
     sed -i '/^\/dev\/mapper\/.*vg-swap/s/^/#/' /etc/fstab
     swapoff /dev/dm-2
     mount -a
@@ -14,11 +13,13 @@ setup_zram() {
 
 setup_locale() {
     sed -i 's/^# *\(pt_BR\.UTF-8\)/\1/' /etc/locale.gen
+    cat /etc/locale.gen | grep -v ^#
     locale-gen
 }
 
 update_system() {
     apt modernize-sources -y
+    rm -f /etc/apt/sources.list~ /etc/apt/sources.list.bak
     sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
@@ -41,22 +42,19 @@ setup_flatpak() {
     flatpak -y install com.github.tchx84.Flatseal
 }
 
-install_basic_packages() {
-    apt install openntpd vim net-tools rsync openssh-server -y
+install_packages() {
     apt install --install-suggests gnome-software -y
     apt install intel-microcode firmware-linux firmware-linux-nonfree firmware-misc-nonfree dkms -y
-}
 
-install_extra_packages() {
-    apt install flatpak vim net-tools vim build-essential ffmpeg  \
-	 	libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
+    apt install openntpd vim net-tools rsync openssh-server flatpak vim net-tools \
+        vim build-essential ffmpeg libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
         gnome-shell-extension-appindicator tigervnc-viewer dnsutils \
 	 	astyle inxi vlc texlive-extra-utils graphicsmagick-imagemagick-compat  \
         python3-pip pipx apt-transport-https ca-certificates curl wget \
         fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip synaptic default-jre chromium thunderbird solaar \
-        gimp audacity keepassxc yt-dlp -y
+        gimp audacity keepassxc yt-dlp tree -y
 }
 
 setup_firefox() {
@@ -217,10 +215,8 @@ auto() {
     update_system
     msg 'Installing backports repo'
     install_backports_repo
-    msg 'Installing basic packages'
-    install_basic_packages
-    msg 'Installing extra packages'
-    install_extra_packages
+    msg 'Installing packages'
+    install_packages
     msg 'Setting up flatpak'
     setup_flatpak
     msg 'Setting up firefox'
