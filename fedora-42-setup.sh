@@ -4,6 +4,9 @@ setup_zram() {
     echo 'ZRAM is setup by default in Fedora.'
 }
 
+setup_locale() {
+}
+
 update_system() {
     dnf -y update
 }
@@ -30,18 +33,12 @@ install_packages() {
         hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra chromium solaar
+        gdk-pixbuf2-modules-extra chromium solaar audacity gimp keepassxc
 
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva 
     dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
     dnf -y install libva-intel-driver    
-}
-
-install_extra_packages_flatpak() {
-    flatpak -y install flathub org.gimp.GIMP
-    flatpak -y install flathub org.audacityteam.Audacity 
-    flatpak -y install flathub org.keepassxc.KeePassXC 
 }
 
 setup_firefox() {
@@ -186,6 +183,8 @@ main() {
 auto() {
     msg 'Setting up swap'
     setup_zram    
+    msg 'Setting up locale'
+    setup_locale
     msg 'Updating system'
     update_system
     msg 'Install external repos'
@@ -194,7 +193,6 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    install_extra_packages_flatpak
     msg 'Setting up firefox'
     setup_firefox
     msg 'Setting up containers'
