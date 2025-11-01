@@ -80,31 +80,6 @@ unqualified-search-registries = ["docker.io"]
 ' >> /etc/containers/registries.conf
 }
 
-setup_docker() {
-    apt-get remove docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc -y
-    apt-get update -y
-    apt-get install ca-certificates curl -y
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
-
-    echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
-    apt-get update -y
-
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-
-    systemctl enable --now docker
-
-    # groupadd docker
-    for userpath in /home/*; do
-        usermod -a -G docker $(basename $userpath)
-    done 
-}
-
-
 setup_fonts() {
     echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections    
     apt install ttf-mscorefonts-installer -y
@@ -141,14 +116,8 @@ USB_EXCLUDE_BTUSB=1
     tlp-stat -s
 }
 
-install_chrome() {
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    apt install ./google-chrome-stable_current_amd64.deb -y
-    rm -f google-chrome-stable_current_amd64.deb
-}
-
 install_veracrypt() {
-    export VC_VERSION="1.26.20"
+    export VC_VERSION="1.26.24"
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb
     wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Ubuntu-24.04-amd64.deb.sig
     wget https://www.idrix.fr/VeraCrypt/VeraCrypt_PGP_public_key.asc
@@ -275,29 +244,26 @@ auto() {
     setup_zram    
     msg 'Installing basic packages'
     install_basic_packages
-    #msg 'Setting up flathub'
-    #setup_flathub    
+    msg 'Setting up flathub'
+    setup_flathub    
     msg 'Setting up TLP'
     setup_tlp
     msg 'Setting up firewall'
     setup_firewall
     msg 'Installing extra packages'
     install_extra_packages
-    #msg 'Setup containers'
-    #setup_podman
-    #setup_docker
+    msg 'Setup containers'
+    setup_podman
     msg 'Install MS fonts'
     setup_fonts
-    #msg 'Install chrome'
-    #install_chrome
-    #msg 'Install veracrypt'
-    #install_veracrypt
-    #msg 'Install code'
-    #install_vscode
-    #msg 'Install freeplane'
-    #install_freeplane
-    #msg 'Install qemu'
-    #install_qemu
+    msg 'Install veracrypt'
+    install_veracrypt
+    msg 'Install code'
+    install_vscode
+    msg 'Install freeplane'
+    install_freeplane
+    msg 'Install qemu'
+    install_qemu
     msg 'Cleaning up'
     cleanup
 }
