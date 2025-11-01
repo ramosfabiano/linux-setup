@@ -16,15 +16,12 @@ install_external_repos() {
 }
 
 setup_flatpak() {
+    dnf -y install flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     flatpak -y install com.github.tchx84.Flatseal
 }
 
-remove_unwanted_packages() {
-    dnf -y remove libreoffice*
-}
-
-install_basic_packages() {
+install_packages() {
     dnf -y install flatpak vim thunderbird git \
         vlc cmake gcc-c++ boost-devel flatpak thunderbird vim  \
         dnsutils java-latest-openjdk astyle  \
@@ -34,9 +31,7 @@ install_basic_packages() {
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
         gdk-pixbuf2-modules-extra chromium solaar
-}
 
-install_extra_packages() {
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva 
     dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
@@ -47,8 +42,6 @@ install_extra_packages_flatpak() {
     flatpak -y install flathub org.gimp.GIMP
     flatpak -y install flathub org.audacityteam.Audacity 
     flatpak -y install flathub org.keepassxc.KeePassXC 
-    flatpak -y install flathub org.freeplane.App
-    flatpak -y install flathub org.libreoffice.LibreOffice
 }
 
 setup_firefox() {
@@ -76,7 +69,6 @@ setup_firewall() {
     firewall-cmd --list-all
 }
 
-
 install_veracrypt() {
     export VC_VERSION="1.26.24"
     cd /tmp
@@ -89,7 +81,6 @@ install_veracrypt() {
     rm -f VeraCrypt* veracrypt*  
 }
 
-
 install_vscode() {
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     echo '
@@ -101,6 +92,10 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 ' > /etc/yum.repos.d/vscode.repo
     dnf -y install code
+}
+
+install_freeplane() {
+    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
@@ -190,35 +185,33 @@ main() {
 
 auto() {
     msg 'Setting up swap'
-    setup_zram 
-    msg 'Removing unwanted packages'
-    remove_unwanted_packages
+    setup_zram    
     msg 'Updating system'
     update_system
     msg 'Install external repos'
     install_external_repos
-    msg 'Installing basic packages'
-    install_basic_packages
-    msg 'Installing extra packages'
-    install_extra_packages
+    msg 'Installing packages'
+    install_packages
     msg 'Setting up flatpak'
     setup_flatpak
     install_extra_packages_flatpak
-    msg 'Setup firefox'
+    msg 'Setting up firefox'
     setup_firefox
-    msg 'Setup containers'
+    msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
     setup_firewall
-    msg 'Install MS fonts'
+    msg 'Installing MS fonts'
     setup_fonts
-    msg 'Install veracrypt'
+    msg 'Installing veracrypt'
     install_veracrypt
-    msg 'Install code'
+    msg 'Installing code'
     install_vscode
-    msg 'Disable smart card'
+    msg 'Installing freeplane'
+    install_freeplane
+    msg 'Disabling smart card'
     disable_smart_card
-    msg 'Install qemu'
+    msg 'Installing qemu'
     install_qemu
 }
 
