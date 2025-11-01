@@ -5,6 +5,7 @@ setup_zram() {
 }
 
 setup_locale() {
+    echo "No locale setup needed."
 }
 
 update_system() {
