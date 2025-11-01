@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+setup_zram() {
+    apt install zram-tools -y
+    echo -e "ALGO=zstd\nPERCENT=15" | tee -a /etc/default/zramswap
+    systemctl restart zramswap
+    swapon -s
+}
+
 remove_unattended_upgrades() {
     systemctl disable --now unattended-upgrades
     apt remove unattended-upgrades -y
@@ -9,6 +16,11 @@ Pin: release a=*
 Pin-Priority: -10
 ' > /etc/apt/preferences.d/nounattended.pref
 }
+
+update_system() {
+    apt update && apt upgrade -y
+}
+
 
 remove_mozilla_snaps() {
     remove_unattended_upgrades
@@ -48,15 +60,13 @@ Pin-Priority: -1
     apt install firefox thunderbird -y
 }
 
-update_system() {
-    apt update && apt upgrade -y
+setup_flatpak() {
+    apt install flatpak -y
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak -y install com.github.tchx84.Flatseal
 }
 
-cleanup() {
-    apt autoremove -y
-}
-
-install_basic_packages() {
+install_packages() {
     apt install vim net-tools rsync openssh-server -y
     apt install --install-suggests gnome-software -y
 }
@@ -69,12 +79,11 @@ install_extra_packages() {
         python3-pip pipx apt-transport-https ca-certificates curl software-properties-common wget \
         fonts-liberation libu2f-udev libvulkan1 \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
-        hplip keepassxc  synaptic default-jre audacity -y
-    apt install solaar -y # logi bolt
+        hplip keepassxc  synaptic default-jre audacity solaar yt-dlp tree -y
 }
 
 setup_podman() {
-    apt install podman podman-docker podman-compose -y
+    apt install podman podman-compose podman-docker -y
     echo '
 unqualified-search-registries = ["docker.io"]
 ' >> /etc/containers/registries.conf
@@ -85,35 +94,15 @@ setup_fonts() {
     apt install ttf-mscorefonts-installer -y
 }
 
-setup_flathub() {
-    apt install flatpak -y
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    flatpak install com.github.tchx84.Flatseal -y
-}
-
-setup_zram() {
-    apt install zram-tools -y
-    echo -e "ALGO=zstd\nPERCENT=20" | tee -a /etc/default/zramswap
-    systemctl restart zramswap
-    swapon -s
-}
-
-setup_tlp() {
-    apt install tlp tlp-rdw smartmontools -y
-    apt remove power-profiles-daemon -y
-    echo '
-TLP_ENABLE=1
-CPU_SCALING_GOVERNOR_ON_BAT=powersave
-RESTORE_THRESHOLDS_ON_BAT=1
-USB_AUTOSUSPEND=0
-USB_EXCLUDE_AUDIO=1
-USB_EXCLUDE_PHONE=1
-USB_EXCLUDE_BTUSB=1
-' > /etc/tlp.conf 
-    systemctl enable tlp.service
-    systemctl start tlp.service
-    systemctl mask systemd-rfkill.service systemd-rfkill.socket
-    tlp-stat -s
+setup_firewall() {
+    apt install ufw gufw -y
+    systemctl stop ssh.socket ssh
+    systemctl disable ssh.socket ssh
+    ufw enable
+    ufw default deny incoming
+    ufw default allow outgoing
+    ufw allow mdns
+    ufw status verbose
 }
 
 install_veracrypt() {
@@ -140,14 +129,17 @@ install_vscode() {
 }
 
 install_freeplane() {
-    flatpak -y install org.freeplane.App
+    flatpak -y install flathub org.freeplane.App
 }
 
-install_qemu() {
+disable_smart_card() {
     systemctl stop pcscd.socket
     systemctl stop pcscd
     systemctl disable pcscd
     systemctl mask pcscd
+}
+
+install_qemu() {
     apt install qemu-system qemu-kvm libvirt-daemon libvirt-clients bridge-utils virt-manager libvirt-daemon-system \
         virtinst qemu-utils virt-viewer spice-client-gtk gir1.2-spice* ebtables swtpm swtpm-tools ovmf virtiofsd -y
     virsh net-autostart default
@@ -155,16 +147,6 @@ install_qemu() {
     for userpath in /home/*; do
         usermod -a -G libvirt,kvm $(basename $userpath)
     done    
-}
-
-setup_firewall() {
-    apt install ufw gufw -y
-    systemctl stop ssh.socket ssh
-    systemctl disable ssh.socket ssh
-    ufw enable    
-    ufw default deny incoming
-    ufw default allow outgoing
-    ufw status verbose
 }
 
 ask_reboot() {
@@ -231,7 +213,9 @@ main() {
 
 }
 
-auto() { 
+auto() {
+    msg 'Setting up swap'
+    setup_zram  
     msg 'Updating system'
     update_system
     msg 'Removing unattended upgrades'
@@ -240,19 +224,15 @@ auto() {
     remove_mozilla_snaps
     msg 'Installing Firefox and Thunderbird (DEB)'
     install_mozilla_apps
-    msg 'Setting up zram'
-    setup_zram    
-    msg 'Installing basic packages'
-    install_basic_packages
-    msg 'Setting up flathub'
-    setup_flathub    
-    msg 'Setting up TLP'
-    setup_tlp
+    msg 'Installing packages'
+    install_packages
+    msg 'Setting up flatpak'
+    setup_flatpak
     msg 'Setting up firewall'
     setup_firewall
     msg 'Installing extra packages'
     install_extra_packages
-    msg 'Setup containers'
+    msg 'Setting up containers'
     setup_podman
     msg 'Install MS fonts'
     setup_fonts
@@ -262,10 +242,10 @@ auto() {
     install_vscode
     msg 'Install freeplane'
     install_freeplane
+    msg 'Disabling smart card'
+    disable_smart_card
     msg 'Install qemu'
     install_qemu
-    msg 'Cleaning up'
-    cleanup
 }
 
 (return 2> /dev/null) || main
