@@ -19,9 +19,9 @@ install_external_repos() {
 }
 
 setup_flatpak() {
-    dnf -y install flatpak
+    dnf -y install flathub flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    flatpak -y install com.github.tchx84.Flatseal
+    flatpak -y install flathub com.github.tchx84.Flatseal
 }
 
 install_packages() {
