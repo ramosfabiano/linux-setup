@@ -193,8 +193,8 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    #msg 'Setting up firefox'
-    #setup_firefox
+    msg 'Setting up firefox'
+    setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
