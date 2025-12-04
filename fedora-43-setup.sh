@@ -41,11 +41,6 @@ install_packages() {
     dnf -y install libva-intel-driver    
 }
 
-setup_firefox() {
-    dnf -y remove --noautoremove firefox
-    flatpak -y install flathub org.mozilla.firefox
-}
-
 setup_podman() {
     dnf -y install podman podman-compose podman-docker 
 }
@@ -92,7 +87,8 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 }
 
 install_freeplane() {
-    flatpak -y install flathub org.freeplane.App
+    #flatpak -y install flathub org.freeplane.App
+    dnf -y install https://download.opensuse.org/repositories/Office/16.0/noarch/freeplane-1.11.12-lp160.4.5.noarch.rpm
 }
 
 disable_smart_card() {
@@ -193,8 +189,6 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setting up firefox'
-    setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
