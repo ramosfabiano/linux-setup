@@ -88,8 +88,6 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 
 install_freeplane() {
     flatpak -y install flathub org.freeplane.App
-    #dnf -y install https://download.opensuse.org/repositories/Office/16.0/noarch/freeplane-1.11.12-lp160.4.5.noarch.rpm java-21-openjdk
-    #alternatives --set java /usr/lib/jvm/java-21-openjdk/bin/java
 }
 
 disable_smart_card() {
