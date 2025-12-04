@@ -19,7 +19,7 @@ install_external_repos() {
 }
 
 setup_flatpak() {
-    dnf -y install flathub flatpak
+    dnf -y install flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     flatpak -y install flathub com.github.tchx84.Flatseal
 }
@@ -42,7 +42,7 @@ install_packages() {
 }
 
 setup_firefox() {
-    dnf -y remove firefox
+    dnf -y remove --noautoremove firefox
     flatpak -y install flathub org.mozilla.firefox
 }
 
@@ -193,8 +193,8 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setting up firefox'
-    setup_firefox
+    #msg 'Setting up firefox'
+    #setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
