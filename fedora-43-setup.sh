@@ -111,6 +111,15 @@ install_qemu() {
     echo "firewall_backend  = \"iptables\"" >> /etc/libvirt/network.conf
 }
 
+setup_camera() {
+    # https://mozilla.github.io/webrtc-landing/gum_test.html
+    # xps 9340 - ov02c10
+    dnf -y remove akmod-intel-ipu6 'kmod-intel-ipu6*'
+    dnf -y install libcamera-qcam libcamera-tools
+    cam -l
+    dmesg | grep -i ipu6
+}
+
 ask_reboot() {
     echo 'Reboot now? (y/n)'
     while true; do
@@ -204,6 +213,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
+    msg 'Setup camera (experimental)'
+    setup_camera
 }
 
 (return 2> /dev/null) || main
