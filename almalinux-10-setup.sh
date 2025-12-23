@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
 setup_zram() {
-    echo 'ZRAM is setup by default in Fedora.'
-}
-
-setup_locale() {
-    echo "No locale setup needed."
+    dnf -y install zram-generator
+    echo '
+[zram0]
+zram-size = min(ram / 2, 4096)
+compression-algorithm = zstd
+swap-priority = 100
+fs-type = swap
+' > /etc/systemd/zram-generator.conf
+    systemctl daemon-reload
+    systemctl start /dev/zram0
+    zramctl
+    swapon -s
 }
 
 update_system() {
@@ -13,15 +20,24 @@ update_system() {
 }
 
 install_external_repos() {
-    dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
-    dnf -y install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    dnf config-manager --set-enabled crb
+    # el repo
+    dnf -y install elrepo-release
+    # epel
+    dnf -y install epel-release
+    # rpm fusion
+    dnf -y install https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm 
+    dnf -y install https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm
+    # list
+    dnd repolist
+    # update
     dnf -y update
 }
 
 setup_flatpak() {
     dnf -y install flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    flatpak -y install flathub com.github.tchx84.Flatseal
+    flatpak -y install com.github.tchx84.Flatseal
 }
 
 install_packages() {
@@ -33,12 +49,24 @@ install_packages() {
         hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra chromium solaar audacity gimp keepassxc
+        gdk-pixbuf2-modules-extra chromium ntfs-3g
+}
 
+install_extra_packages() {
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva 
     dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
     dnf -y install libva-intel-driver    
+}
+
+install_extra_packages_flatpak() {
+    flatpak -y install flathub org.freeplane.App
+    flatpak -y install flathub org.libreoffice.LibreOffice
+}
+
+setup_firefox() {
+    # dnf -y remove firefox  # remove ESR version
+    flatpak -y install flathub org.mozilla.firefox
 }
 
 setup_podman() {
@@ -74,6 +102,10 @@ install_veracrypt() {
 }
 
 install_vscode() {
+    # still required? MS key still uses SHA-1?
+    # https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/security_hardening/using-system-wide-cryptographic-policies
+    # update-crypto-policies --set LEGACY 
+    
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     echo '
 [code]
@@ -84,10 +116,6 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 ' > /etc/yum.repos.d/vscode.repo
     dnf -y install code
-}
-
-install_freeplane() {
-    flatpak -y install flathub org.freeplane.App
 }
 
 disable_smart_card() {
@@ -106,19 +134,6 @@ install_qemu() {
     for userpath in /home/*; do
         usermod -a -G libvirt,kvm $(basename $userpath)
     done
-    
-    # still required?
-    echo "firewall_backend  = \"iptables\"" >> /etc/libvirt/network.conf
-}
-
-setup_camera() {
-    # https://mozilla.github.io/webrtc-landing/gum_test.html
-    # xps 9340 - ov02c10
-    
-    dnf -y remove akmod-intel-ipu6 'kmod-intel-ipu6*'
-    dnf -y install libcamera-qcam libcamera-tools
-    cam -l
-    dmesg | grep -i ipu6
 }
 
 ask_reboot() {
@@ -188,34 +203,33 @@ main() {
 auto() {
     msg 'Setting up swap'
     setup_zram    
-    msg 'Setting up locale'
-    setup_locale
     msg 'Updating system'
     update_system
     msg 'Install external repos'
     install_external_repos
-    msg 'Installing packages'
+    msg 'Installing basic packages'
     install_packages
+    msg 'Installing extra packages'
+    install_extra_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setting up containers'
+    install_extra_packages_flatpak
+    msg 'Setup firefox'
+    setup_firefox
+    msg 'Setup containers'
     setup_podman
     msg 'Setting up firewall'
     setup_firewall
-    msg 'Installing MS fonts'
+    msg 'Install MS fonts'
     setup_fonts
-    msg 'Installing veracrypt'
+    msg 'Install veracrypt'
     install_veracrypt
-    msg 'Installing code'
+    msg 'Install code'
     install_vscode
-    msg 'Installing freeplane'
-    install_freeplane
-    msg 'Disabling smart card'
+    msg 'Disable smart card'
     disable_smart_card
-    msg 'Installing qemu'
+    msg 'Install qemu'
     install_qemu
-    msg 'Setup camera (experimental)'
-    setup_camera
 }
 
 (return 2> /dev/null) || main
