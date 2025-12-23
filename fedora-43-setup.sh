@@ -41,6 +41,10 @@ install_packages() {
     dnf -y install libva-intel-driver    
 }
 
+setup_firefox() {
+    flatpak -y install flathub org.mozilla.firefox
+}
+
 setup_podman() {
     dnf -y install podman podman-compose podman-docker 
 }
@@ -198,6 +202,8 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
+    msg 'Setting up firefox'
+    setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'

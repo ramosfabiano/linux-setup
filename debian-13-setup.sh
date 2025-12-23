@@ -58,7 +58,6 @@ install_packages() {
 }
 
 setup_firefox() {
-    # apt remove firefox-esr -y  # remove firefox ESR
     flatpak -y install flathub org.mozilla.firefox
 }
 
