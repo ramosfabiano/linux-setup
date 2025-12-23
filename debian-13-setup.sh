@@ -92,14 +92,14 @@ setup_firewall() {
 
 install_veracrypt() {
     export VC_VERSION="1.26.24"
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Debian-12-amd64.deb
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Debian-12-amd64.deb.sig
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Debian-13-amd64.deb
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Debian-13-amd64.deb.sig
     wget https://www.idrix.fr/VeraCrypt/VeraCrypt_PGP_public_key.asc
     gpg --import VeraCrypt_PGP_public_key.asc
-    gpg --verify veracrypt-$VC_VERSION-Debian-12-amd64.deb.sig
-    apt install ./veracrypt-$VC_VERSION-Debian-12-amd64.deb -y
-    rm -f veracrypt-$VC_VERSION-Debian-12-amd64.deb
-    rm -f veracrypt-$VC_VERSION-Debian-12-amd64.deb.sig
+    gpg --verify veracrypt-$VC_VERSION-Debian-13-amd64.deb.sig
+    apt install ./veracrypt-$VC_VERSION-Debian-13-amd64.deb -y
+    rm -f veracrypt-$VC_VERSION-Debian-13-amd64.deb
+    rm -f veracrypt-$VC_VERSION-Debian-13-amd64.deb.sig
     rm -f VeraCrypt_PGP_public_key.asc
     rm -f VeraCrypt_PGP_public_key.asc.1   
 }
