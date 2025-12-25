@@ -39,7 +39,6 @@ Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 setup_flatpak() {
     apt install flatpak -y
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    flatpak -y install com.github.tchx84.Flatseal
 }
 
 install_packages() {
