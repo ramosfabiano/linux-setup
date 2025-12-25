@@ -42,7 +42,7 @@ install_packages() {
 }
 
 setup_firefox() {
-    flatpak -y install flathub org.mozilla.firefox
+    echo "Nothing to do"
 }
 
 setup_podman() {
