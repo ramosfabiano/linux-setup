@@ -120,10 +120,6 @@ Signed-By: /usr/share/keyrings/microsoft.gpg
     apt install code -y
 }
 
-install_freeplane() {
-    flatpak -y install flathub org.freeplane.App
-}
-
 disable_smart_card() {
     systemctl stop pcscd.socket
     systemctl stop pcscd
@@ -230,8 +226,6 @@ auto() {
     install_veracrypt
     msg 'Installing code'
     install_vscode
-    msg 'Installing freeplane'
-    install_freeplane
     msg 'Disabling smart card'
     disable_smart_card
     msg 'Installing qemu'
