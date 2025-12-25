@@ -68,17 +68,17 @@ URIs: https://packages.mozilla.org/apt
 Suites: mozilla
 Components: main
 Signed-By: /etc/apt/keyrings/packages.mozilla.org.asc
-' | tee /etc/apt/sources.list.d/mozilla.sources 
+' > /etc/apt/sources.list.d/mozilla.sources 
 
     echo '
 Package: *
 Pin: origin packages.mozilla.org
 Pin-Priority: 1000
-' | tee /etc/apt/preferences.d/mozilla     
+' > /etc/apt/preferences.d/mozilla     
     
     apt update
-    apt -y install firefox 
-    apt -y remove firefox-esr   
+    apt install firefox -y
+    apt remove firefox-esr -y 
 }
 
 setup_podman() {
