@@ -42,6 +42,7 @@ setup_flatpak() {
 
     flatpak install com.github.tchx84.Flatseal -y
     flatpak install org.mozilla.firefox -y
+    flatpak install org.mozilla.Thunderbird -y
     flatpak install org.freeplane.App -y
 }
 
