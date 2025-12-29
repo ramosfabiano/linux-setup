@@ -39,6 +39,10 @@ Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 setup_flatpak() {
     apt install flatpak -y
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    flatpak install com.github.tchx84.Flatseal -y
+    flatpak install org.mozilla.firefox -y
+    flatpak install org.freeplane.App -y
 }
 
 install_packages() {
@@ -54,10 +58,6 @@ install_packages() {
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip synaptic default-jre chromium thunderbird solaar \
         gimp audacity keepassxc yt-dlp tree -y
-}
-
-setup_firefox() {
-    flatpak install org.mozilla.firefox -y
 }
 
 setup_podman() {
@@ -213,8 +213,6 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setting up firefox'
-    setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'

@@ -21,6 +21,10 @@ install_external_repos() {
 setup_flatpak() {
     dnf -y install flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    flatpak install com.github.tchx84.Flatseal -y
+    flatpak install org.mozilla.firefox -y
+    flatpak install org.freeplane.App -y
 }
 
 install_packages() {
@@ -38,10 +42,6 @@ install_packages() {
     dnf -y install ffmpeg-libs libva 
     dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
     dnf -y install libva-intel-driver    
-}
-
-setup_firefox() {
-    flatpak install org.mozilla.firefox -y
 }
 
 setup_podman() {
@@ -197,8 +197,6 @@ auto() {
     install_packages
     msg 'Setting up flatpak'
     setup_flatpak
-    msg 'Setting up firefox'
-    setup_firefox
     msg 'Setting up containers'
     setup_podman
     msg 'Setting up firewall'
