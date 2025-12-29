@@ -41,9 +41,13 @@ setup_flatpak() {
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
     flatpak install com.github.tchx84.Flatseal -y
+    flatpak install org.freeplane.App -y
+    
     flatpak install org.mozilla.firefox -y
     flatpak install org.mozilla.Thunderbird -y
-    flatpak install org.freeplane.App -y
+
+    apt remove firefox-esr -y
+    apt remove thunderbird -y
 }
 
 install_packages() {
