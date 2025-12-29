@@ -41,7 +41,7 @@ install_packages() {
 }
 
 setup_firefox() {
-    echo "Nothing to do"
+    flatpak install org.mozilla.firefox -y
 }
 
 setup_podman() {
