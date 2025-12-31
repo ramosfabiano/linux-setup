@@ -107,10 +107,28 @@ install_veracrypt() {
     rm -f VeraCrypt_PGP_public_key.asc.1   
 }
 
+install_cursor() {
+    apt -y install wget gpg apt-transport-https
+    wget -qO- https://downloads.cursor.com/keys/anysphere.asc | gpg --dearmor > anysphere.gpg
+    install -D -o root -g root -m 644 anysphere.gpg /usr/share/keyrings/anysphere.gpg
+    rm -f anysphere.gpg
+    echo '
+Types: deb
+URIs: https://downloads.cursor.com/aptrepo
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /usr/share/keyrings/anysphere.gpg
+' > /etc/apt/sources.list.d/cursor.sources
+    apt update -y
+    apt install cursor -y
+}
+
+
 install_vscode() {
     apt -y install wget gpg apt-transport-https
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-    sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg
+    install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg
     rm -f microsoft.gpg
     echo '
 Types: deb
@@ -226,7 +244,8 @@ auto() {
     setup_fonts
     msg 'Installing veracrypt'
     install_veracrypt
-    msg 'Installing code'
+    msg 'Installing coding tools'
+    install_cursor
     install_vscode
     msg 'Disabling smart card'
     disable_smart_card

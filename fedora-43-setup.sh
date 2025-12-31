@@ -81,6 +81,19 @@ install_veracrypt() {
     rm -f VeraCrypt* veracrypt*  
 }
 
+install_cursor() {
+    rpm --import https://downloads.cursor.com/keys/anysphere.asc
+    echo '
+[code]
+name=Cursor
+baseurl=https://downloads.cursor.com/yumrepo
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.cursor.com/keys/anysphere.asc
+' > /etc/yum.repos.d/cursor.repo
+    dnf -y install cursor
+}
+
 install_vscode() {
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     echo '
@@ -210,7 +223,8 @@ auto() {
     setup_fonts
     msg 'Installing veracrypt'
     install_veracrypt
-    msg 'Installing code'
+    msg 'Installing coding tools'
+    install_cursor
     install_vscode
     msg 'Disabling smart card'
     disable_smart_card
