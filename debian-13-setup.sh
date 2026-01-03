@@ -159,6 +159,15 @@ install_qemu() {
     done    
 }
 
+setup_camera() {
+    # https://mozilla.github.io/webrtc-landing/gum_test.html
+    # xps 9340 - ov02c10
+
+    apt install  libcamera-tools -y
+    cam -l
+    dmesg | grep -i ipu6
+}
+
 ask_reboot() {
     echo 'Reboot now? (y/n)'
     while true; do
@@ -251,6 +260,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
+    msg 'Setup camera (experimental)'
+    setup_camera
 }
 
 (return 2> /dev/null) || main
