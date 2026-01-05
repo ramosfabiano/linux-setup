@@ -22,11 +22,11 @@ setup_flatpak() {
     dnf -y install flatpak
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-    flatpak install com.github.tchx84.Flatseal -y
-    flatpak install org.freeplane.App -y
+    flatpak install flathub com.github.tchx84.Flatseal -y
+    flatpak install flathub org.freeplane.App -y
     
-    flatpak install org.mozilla.firefox -y
-    flatpak install org.mozilla.Thunderbird -y
+    flatpak install flathub org.mozilla.firefox -y
+    flatpak install flathub org.mozilla.Thunderbird -y
 
     dnf remove  --noautoremove firefox -y
     dnf remove  --noautoremove thunderbird -y
