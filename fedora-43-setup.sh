@@ -57,6 +57,7 @@ setup_podman() {
 setup_fonts() {
     dnf -y install curl cabextract xorg-x11-font-utils fontconfig
     wget https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
+    echo "0cd8fc72921f917ce27b2e639da6fe25eaa736b4  msttcore-fonts-installer-2.6-1.noarch.rpm" | sha1sum --check
     echo "55d7f3a86533225634ff3ea2384b4356d9665a29cc7eeacff16602a1714afbb4  msttcore-fonts-installer-2.6-1.noarch.rpm" | sha256sum --check
     rpm -i --nodigest msttcore-fonts-installer-2.6-1.noarch.rpm
     rm -f msttcore-fonts-installer-2.6-1.noarch.rpm
