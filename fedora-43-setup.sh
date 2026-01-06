@@ -55,7 +55,10 @@ setup_podman() {
 
 setup_fonts() {
     dnf -y install curl cabextract xorg-x11-font-utils fontconfig
-    rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
+    wget https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
+    echo "55d7f3a86533225634ff3ea2384b4356d9665a29cc7eeacff16602a1714afbb4  msttcore-fonts-installer-2.6-1.noarch.rpm" | sha256sum --check
+    rpm -i --nodigest msttcore-fonts-installer-2.6-1.noarch.rpm
+    rm -f msttcore-fonts-installer-2.6-1.noarch.rpm
 }
 
 setup_firewall() {
