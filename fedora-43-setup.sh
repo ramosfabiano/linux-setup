@@ -68,7 +68,7 @@ setup_firewall() {
     firewall-cmd --permanent --remove-service=ssh
     firewall-cmd --permanent --remove-service=dhcpv6-client
     firewall-cmd --permanent --remove-service=cockpit
-    #firewall-cmd --permanent --add-service=mdns
+    firewall-cmd --permanent --remove-service=mdns
     firewall-cmd --reload
     firewall-cmd --list-all
 }
