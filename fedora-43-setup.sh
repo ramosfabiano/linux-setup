@@ -41,7 +41,8 @@ install_packages() {
         hplip* cabextract lzip p7zip p7zip-plugins \
         gnome-tweaks gnome-shell-extension-common.noarch gnome-extensions-app \
         gnome-shell-extension-dash-to-dock gnome-shell-extension-appindicator \
-        gdk-pixbuf2-modules-extra chromium solaar audacity gimp keepassxc
+        gdk-pixbuf2-modules-extra chromium solaar audacity gimp keepassxc \
+        gnome-shell-extension-system-monitor
 
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
     dnf -y install ffmpeg-libs libva 
