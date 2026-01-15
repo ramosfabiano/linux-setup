@@ -235,8 +235,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
-    msg 'Setup camera (experimental)'
-    setup_camera
+    # msg 'Setup camera (experimental)'
+    # setup_camera
 }
 
 (return 2> /dev/null) || main
