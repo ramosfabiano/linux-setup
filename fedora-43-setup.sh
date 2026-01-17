@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-setup_zram() {
-    echo 'ZRAM is setup by default in Fedora.'
-}
-
-setup_locale() {
-    echo "No locale setup needed."
-}
-
 update_system() {
     dnf -y update
 }
@@ -136,7 +128,6 @@ install_qemu() {
 setup_camera() {
     # https://mozilla.github.io/webrtc-landing/gum_test.html
     # xps 9340 - ov02c10
-    
     dnf -y remove akmod-intel-ipu6 'kmod-intel-ipu6*'
     dnf -y install libcamera-qcam libcamera-tools
     cam -l
@@ -208,10 +199,6 @@ main() {
 }
 
 auto() {
-    msg 'Setting up swap'
-    setup_zram    
-    msg 'Setting up locale'
-    setup_locale
     msg 'Updating system'
     update_system
     msg 'Install external repos'
@@ -235,8 +222,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
-    # msg 'Setup camera (experimental)'
-    # setup_camera
+    msg 'Setup camera (experimental)'
+    setup_camera
 }
 
 (return 2> /dev/null) || main
