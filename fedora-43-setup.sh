@@ -139,12 +139,19 @@ setup_tlp() {
     dnf -y remove power-profiles-daemon
     echo '
 TLP_ENABLE=1
+TLP_AUTO_SWITCH=1
+TLP_DEFAULT_MODE=BAL
+CPU_SCALING_GOVERNOR_ON_AC=performance
 CPU_SCALING_GOVERNOR_ON_BAT=powersave
-RESTORE_THRESHOLDS_ON_BAT=1
+CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance
+CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power
+MEM_SLEEP_ON_AC=s2idle
+MEM_SLEEP_ON_BAT=s2idle
 USB_AUTOSUSPEND=0
 USB_EXCLUDE_AUDIO=1
 USB_EXCLUDE_PHONE=1
 USB_EXCLUDE_BTUSB=1
+RESTORE_THRESHOLDS_ON_BAT=1
 ' > /etc/tlp.conf 
     systemctl enable tlp.service
     systemctl start tlp.service
