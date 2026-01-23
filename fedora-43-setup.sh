@@ -134,6 +134,24 @@ setup_camera() {
     dmesg | grep -i ipu6
 }
 
+setup_tlp() {
+    dnf -y install tlp tlp-rdw smartmontools
+    dnf -y remove power-profiles-daemon
+    echo '
+TLP_ENABLE=1
+CPU_SCALING_GOVERNOR_ON_BAT=powersave
+RESTORE_THRESHOLDS_ON_BAT=1
+USB_AUTOSUSPEND=0
+USB_EXCLUDE_AUDIO=1
+USB_EXCLUDE_PHONE=1
+USB_EXCLUDE_BTUSB=1
+' > /etc/tlp.conf 
+    systemctl enable tlp.service
+    systemctl start tlp.service
+    systemctl mask systemd-rfkill.service systemd-rfkill.socket
+    tlp-stat -s
+}
+
 ask_reboot() {
     echo 'Reboot now? (y/n)'
     while true; do
@@ -224,6 +242,8 @@ auto() {
     install_qemu
     msg 'Setup camera (experimental)'
     setup_camera
+    msg 'Setting up tlp'
+    setup_tlp
 }
 
 (return 2> /dev/null) || main
