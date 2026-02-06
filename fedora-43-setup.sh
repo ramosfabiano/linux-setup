@@ -241,8 +241,8 @@ auto() {
     msg 'Installing veracrypt'
     install_veracrypt
     msg 'Installing coding tools'
-    install_cursor
-    #install_vscode
+    #install_cursor
+    install_vscode
     msg 'Disabling smart card'
     disable_smart_card
     msg 'Installing qemu'
