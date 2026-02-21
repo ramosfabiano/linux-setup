@@ -16,7 +16,7 @@ setup_flatpak() {
 
     flatpak install flathub com.github.tchx84.Flatseal -y
     flatpak install flathub org.freeplane.App -y
-    
+    #flatpak install flathub md.obsidian.Obsidian -y
     flatpak install flathub org.mozilla.firefox -y
     flatpak install flathub org.mozilla.Thunderbird -y
 
