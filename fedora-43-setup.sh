@@ -247,8 +247,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
-    msg 'Setup camera (experimental)'
-    setup_camera
+    #msg 'Setup camera (experimental)'
+    #setup_camera
     msg 'Setting up tlp'
     setup_tlp
 }
