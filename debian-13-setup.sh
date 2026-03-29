@@ -121,7 +121,7 @@ Architectures: amd64
 Signed-By: /usr/share/keyrings/anysphere.gpg
 ' > /etc/apt/sources.list.d/cursor.sources
     apt update -y
-    apt install cursor -y
+    apt install cursor cursor-sandbox-apparmor -y
 }
 
 
