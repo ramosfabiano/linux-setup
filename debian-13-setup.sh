@@ -44,7 +44,7 @@ setup_flatpak() {
     flatpak install org.freeplane.App -y
     #flatpak install flathub md.obsidian.Obsidian -y
     flatpak install org.mozilla.firefox -y
-    flatpak install org.mozilla.Thunderbird -y
+    flatpak install org.mozilla.thunderbird_esr -y
 
     apt remove firefox-esr -y
     apt remove thunderbird -y
