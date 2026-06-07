@@ -62,7 +62,7 @@ install_packages() {
         fonts-liberation libu2f-udev libvulkan1 gnome-shell-extension-dashtodock \
 		git xsel gnome-tweaks gnome-shell-extension-prefs gnome-shell-extensions \
         hplip synaptic default-jre chromium solaar \
-        gimp audacity keepassxc yt-dlp tree -y
+        gimp audacity keepassxc tree -y
 }
 
 setup_podman() {
