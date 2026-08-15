@@ -39,10 +39,3 @@ also be referenced explicitly in a prompt with `@test-setup-script`.
 
 Either way, requires `podman` (or `docker`) locally to spin up the
 container.
-
-The procedure lives in
-[.claude/skills/test-setup-script/SKILL.md](.claude/skills/test-setup-script/SKILL.md).
-To cover a new distro, add a row to the table at the top of that file — the
-functions that cannot run in a container are derived from the script itself,
-so there is nothing else to maintain.
-
