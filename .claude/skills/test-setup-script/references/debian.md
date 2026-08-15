@@ -61,8 +61,9 @@ Add these to the shared "Expected non-bugs" list:
   `/dev/dm-2`. That is host-storage-dependent and cannot be validated in a
   container — treat any result from it as meaningless (see "What a container
   cannot tell you" in `SKILL.md`).
-- `install_backports_repo` adds trixie-backports; a failure here shows up much
-  later as an unexpected package version, not as an error at the time.
+- `install_external_repos` adds trixie-backports (Debian's equivalent of
+  Fedora's RPM Fusion step); a failure here shows up much later as an
+  unexpected package version, not as an error at the time.
 
 ## Positive verification worth running
 

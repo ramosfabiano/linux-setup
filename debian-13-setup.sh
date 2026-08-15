@@ -25,7 +25,7 @@ update_system() {
     apt upgrade -y
 }
 
-install_backports_repo() {
+install_external_repos() {
     echo '
 Types: deb deb-src
 URIs: http://deb.debian.org/debian
@@ -123,7 +123,6 @@ Signed-By: /usr/share/keyrings/anysphere.gpg
     apt update -y
     apt install cursor cursor-sandbox-apparmor -y
 }
-
 
 install_vscode() {
     apt -y install wget gpg apt-transport-https
@@ -269,13 +268,13 @@ main() {
 
 auto() {
     msg 'Setting up swap'
-    setup_zram    
+    setup_zram
     msg 'Setting up locale'
     setup_locale
     msg 'Updating system'
     update_system
-    msg 'Installing backports repo'
-    install_backports_repo
+    msg 'Install external repos'
+    install_external_repos
     msg 'Installing packages'
     install_packages
     msg 'Setting up flatpak'
@@ -296,8 +295,8 @@ auto() {
     disable_smart_card
     msg 'Installing qemu'
     install_qemu
-    # msg 'Setup camera (experimental)'
-    # setup_camera
+    #msg 'Setup camera (experimental)'
+    #setup_camera
     msg 'Setting up tlp'
     setup_tlp
 }

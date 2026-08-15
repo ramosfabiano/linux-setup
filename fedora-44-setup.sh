@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+setup_zram() {
+    # n/a on Fedora: zram swap is configured out of the box by zram-generator
+    # (zram-generator-defaults), so there is nothing to set up here.
+    :
+}
+
+setup_locale() {
+    # n/a on Fedora: there is no /etc/locale.gen and no locale-gen binary;
+    # locales ship as glibc-langpack-* packages and are chosen at install time.
+    :
+}
+
 update_system() {
     dnf -y update
 }
@@ -237,6 +249,10 @@ main() {
 }
 
 auto() {
+    msg 'Setting up swap'
+    setup_zram
+    msg 'Setting up locale'
+    setup_locale
     msg 'Updating system'
     update_system
     msg 'Install external repos'
