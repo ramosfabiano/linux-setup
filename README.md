@@ -16,8 +16,18 @@ Post-install setup scripts for personal use.
 ## Testing changes
 
 To test changes to one of these scripts, test it end-to-end in a
-disposable container rather than on real hardware. The procedure is written up as a
-shared skill/rule usable from both Claude Code and Cursor:
-[.claude/skills/test-setup-script/SKILL.md](.claude/skills/test-setup-script/SKILL.md)
-(symlinked at [.cursor/rules/test-setup-script.mdc](.cursor/rules/test-setup-script.mdc)).
+disposable container rather than on real hardware. 
+The procedure is written up as a
+shared skill/rule usable from both Claude Code and Cursor.
+
+**Claude Code**: picked up automatically — just ask it
+to test or verify a setup script (or a fix you just made to one) and it will
+apply the procedure. No manual invocation needed.
+
+**Cursor**: the agent decides whether to pull it in based on its description
+when your prompt is about testing/verifying one of these scripts. Can
+also be referenced explicitly in a prompt with `@test-setup-script`.
+
+Either way, requires `podman` (or `docker`) locally to spin up the
+container.
 
