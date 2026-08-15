@@ -36,7 +36,7 @@ setup_locale() {
 update_system() {
     apt modernize-sources -y
     rm -f /etc/apt/sources.list~ /etc/apt/sources.list.bak
-    sed -i '/^Components:/ s/$/ contrib non-free/' /etc/apt/sources.list.d/debian.sources
+    sed -i 's/^Components:.*/Components: main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources
     apt update
     apt upgrade -y
 }
