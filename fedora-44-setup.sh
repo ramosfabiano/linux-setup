@@ -215,7 +215,7 @@ check_root_user() {
     if [ "$(id -u)" != 0 ]; then
         echo 'Please run the script as root!'
         echo 'We need to do administrative tasks'
-        exit
+        exit 1
     fi
 }
 

@@ -40,8 +40,15 @@ Test the script the way it will really be run. Every distro's README line has
 the same shape:
 
 ```bash
-sudo bash -c "$(wget -qO- .../<distro>-setup.sh) | tee log.txt"
+sudo bash -e -o pipefail -c "$(wget -qO- .../<distro>-setup.sh) | tee log.txt"
 ```
+
+**The `-e` is deliberate and must stay.** These scripts are meant to fail
+fast: if any command in any function fails, the run is over. It is not
+supposed to press on, recover, or be safe to re-run. Do not "fix" a
+half-finished run by removing `-e`, and do not add idempotency guards on the
+grounds that a second run would duplicate something — re-running after a
+failure is not a supported flow. A truncated log is the design working.
 
 Three consequences, all verified empirically — do not assume, they are
 counter-intuitive:
@@ -50,24 +57,39 @@ counter-intuitive:
    attaches to the script's *last line* only — `(return 2> /dev/null) || main`
    becomes `... || main | tee log.txt`. `return` fails when not sourced, so
    `main` runs: the **interactive menu**, not `auto()` directly.
-2. **`tee` masks the exit code**, so the run's status tells you nothing: the
-   pipeline reports `tee`'s status, which is `0` even when the script failed.
-   Judge a run by its log, never by `$?`.
+2. **`-o pipefail` is what makes the exit status truthful, and must stay.**
+   Without it the pipeline reports `tee`'s status — `0` even when the script
+   aborted a third of the way in. With it, a failed run exits nonzero. It
+   changes nothing inside the scripts: every pipeline there has a first stage
+   that cannot fail on its own (`echo`/`cat`/`wget`-into-`gpg`, the last all
+   already fatal under `-e`), so it introduces no new abort points.
 3. **Driving the menu from stdin needs a trailing `q`.** Feed
    `printf '1\nn\nq\n'`: `1` runs `auto()`, `n` answers `ask_reboot`, `q`
    exits. Without the `q`, `read` hits EOF, `choice` stays empty, the `case`
    falls to `*` and the menu **loops forever** printing `[!] Wrong input!`.
 
-**Do not add `-e` to these invocations, and treat its reappearance as a bug.**
-The Fedora line used to read `bash -e -c`, which was measurably harmful:
-errexit is live inside `main`/`auto()`, so the first command returning nonzero
-aborted everything after it while consequence 2 still reported success. With
-`ncurses` present the run died at `setup_firewall`'s `systemctl disable sshd`
-and silently skipped the last six steps, exiting `0`; in a bare container it
-died even earlier, on `msg()`'s own `tput setaf 2`, installing *nothing* and
-still exiting `0`. `msg()` runs before every step, so under `-e` it is a
-recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
-`TERM` is unset, as under a bare `sudo`, cron, or a non-TTY SSH session.
+### Testing under `-e`: use two runs
+
+errexit is live inside `main`/`auto()` — verified, the first nonzero command
+ends the run and later steps never execute. That is correct on real hardware,
+but in a container it makes coverage impossible, because the systemd/D-Bus
+calls fail for environmental reasons that would not occur on a real desktop.
+So test with **two** runs:
+
+- **Faithful run** — the exact README line, `-e` included. Tells you what a
+  user really gets, and where it stops. Prime the container with `ncurses` and
+  `TERM` first (step 2), or it dies on `msg()`'s own `tput` before any real
+  work happens.
+- **Coverage run** — same command with `-e` dropped, purely as a testing
+  device so execution continues past container-only failures and the later
+  functions actually get exercised. Never propose this as a change to the
+  README.
+
+**One real-hardware caveat worth reporting if you see it:** `msg()` calls
+`tput` before every step, and `tput` returns nonzero when `TERM` is unset or
+`dumb` — under `cron`, a non-TTY SSH session, or a `sudo` that does not
+preserve `TERM`. Combined with `-e`, that aborts the run at the first banner
+having done nothing. Interactively `TERM` is set and this does not arise.
 
 All three consequences follow from the **shared script skeleton** (`main` →
 menu → `auto()` → `msg()`/`ask_reboot`, plus the trailing
@@ -107,8 +129,9 @@ as a script keeps that skeleton — see "Adding a new distro".
    `cat` is equivalent to the README's `wget -qO-` — both just inline the
    script text — and tests your uncommitted edits:
    ```bash
+   # faithful run (-e, as the README has it); drop -e for the coverage run
    podman exec -d <distro>-test bash -c \
-     'printf "1\nn\nq\n" | bash -c "$(cat /root/<script>.sh) | tee /root/log.txt" \
+     'export TERM=xterm; printf "1\nn\nq\n" | bash -e -o pipefail -c "$(cat /root/<script>.sh) | tee /root/log.txt" \
         > /root/run.log 2>&1; echo "DONE_EXIT:$?" >> /root/run.log'
    ```
    A full run takes 10-15 minutes, so launch it detached (`exec -d`) and poll
@@ -117,10 +140,11 @@ as a script keeps that skeleton — see "Adding a new distro".
    ```bash
    until podman exec <distro>-test grep -q '^DONE_EXIT:' /root/run.log; do sleep 10; done
    ```
-   `DONE_EXIT:` is only a **completion sentinel — never a pass/fail signal.**
-   `tee` masks the real status, and the value is otherwise just the last
-   command's status: a healthy run once ended `EXIT:127` purely because
-   `tlp-stat` was the final command and was missing.
+   With `-e -o pipefail` the `DONE_EXIT:` value is now **meaningful**: nonzero
+   means the run aborted. Still confirm *where* it stopped from the log (step
+   5) — the exit code says a failure happened, not which function caused it.
+   Note the coverage run (no `-e`) is the exception: there the value is just
+   the last command's status and means nothing.
 
    To exercise one function in isolation instead, **source** the script —
    sourcing makes the trailing `return` succeed so the menu never fires:
@@ -153,9 +177,11 @@ as a script keeps that skeleton — see "Adding a new distro".
    grep -oE "msg '.*'" <script>.sh     # the expected sequence
    ```
    A healthy full run ends with `[*] Done!` having hit every step. Anything
-   short of that is truncation — which, given consequence 2, will still have
-   exited `0`. This check is what caught the old `-e` invocation stopping at
-   `[*] Setting up firewall` and skipping the last six steps.
+   short of that means `-e` aborted the run there. **The last banner printed
+   tells you which function failed**; that is the finding to report, since
+   under `-e` everything after it never ran. On a faithful
+   container run expect a stop at `[*] Setting up firewall` (the `systemctl`
+   calls) — environmental, not a script bug.
 
 6. **Confirm successes positively — absence of grep hits is weak evidence.**
    The decisive checks are direct queries (exact commands in the distro
