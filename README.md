@@ -10,7 +10,7 @@ Post-install setup scripts for personal use.
 
 ## Fedora 44
 
-`sudo bash -e -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-44-setup.sh) | tee log.txt"`
+`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-44-setup.sh) | tee log.txt"`
 
 
 ## Testing changes
