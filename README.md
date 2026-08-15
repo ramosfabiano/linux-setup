@@ -2,6 +2,12 @@
 
 Post-install setup scripts for personal use.
 
+These run fail-fast (`-e`): if any command in any function fails, the run is
+over — it does not continue, recover or resume. The scripts are **not
+idempotent** and are meant to be run **once** against a freshly installed
+system. Re-running them on a machine they have already touched is not
+supported; if a run fails, fix the cause and start again from a clean install.
+
 
 ## Debian 13
 
