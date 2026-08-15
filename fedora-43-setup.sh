@@ -104,6 +104,19 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
     dnf -y install code
 }
 
+install_claude() {
+    rpm --import https://downloads.claude.ai/keys/claude-code.asc
+    echo '
+[claude-code]
+name=Claude Code
+baseurl=https://downloads.claude.ai/claude-code/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.claude.ai/keys/claude-code.asc
+' > /etc/yum.repos.d/claude-code.repo
+    dnf -y install claude-code
+}
+
 disable_smart_card() {
     systemctl stop pcscd.socket
     systemctl stop pcscd
@@ -243,6 +256,7 @@ auto() {
     msg 'Installing coding tools'
     install_cursor
     install_vscode
+    install_claude
     msg 'Disabling smart card'
     disable_smart_card
     msg 'Installing qemu'
