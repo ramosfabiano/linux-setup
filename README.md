@@ -24,9 +24,8 @@ run fails, fix the cause and start again from a clean install.
 
 ## Testing changes
 
-To test changes to one of these scripts, test it end-to-end in a
-disposable container rather than on real hardware. 
-The procedure is written up as a
+To partially test changes to one of these scripts, test it end-to-end in a
+disposable container rather than on real hardware. The procedure is written up as a
 shared skill/rule usable from both Claude Code and Cursor.
 
 **Claude Code**: picked up automatically — just ask it
@@ -34,8 +33,11 @@ to test or verify a setup script and it will
 apply the procedure. No manual invocation needed.
 
 **Cursor**: the agent decides whether to pull it in based on its description
-when your prompt is about testing one of these scripts. Can
+when your prompt is about testing one of these scripts, and can
 also be referenced explicitly in a prompt with `@test-setup-script`.
 
-Either way, requires `podman` (or `docker`) locally to spin up the
-container.
+Keep in mind that some of
+the script's functions cannot be tested in a container. Functions that cannot
+work there (zram, firewall, TLP, …) are skipped entirely — including work inside
+them that a container could otherwise check. A real machine or a full VM
+is the only complete test.
