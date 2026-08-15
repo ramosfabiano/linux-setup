@@ -146,17 +146,56 @@ That is why step 7 requires naming them in every report.
    podman exec -d <distro>-test bash -c \
      'export TERM=xterm
       printf "1\nn\nq\n" | bash -c "$(cat /root/<script>.sh)" \
-        > /root/run.log 2>&1; echo "DONE_EXIT:$?" >> /root/run.log'
+        > /root/run.log 2>&1; printf "\nDONE_EXIT:%s\n" "$?" >> /root/run.log'
    ```
    The redirect to `run.log` is the harness capturing output for triage — it
-   is not part of the README invocation, which no longer logs anything.
+   is not part of the README invocation, which no longer logs anything. Write
+   the marker with a leading newline: the script's last output may end without
+   one, and `DONE_EXIT` glued onto a partial line defeats the `^` anchor below
+   and the watchdog then waits forever.
 
-   A full run takes several minutes, so launch it detached and poll from a
-   backgrounded Bash call rather than blocking the session:
+   A full run takes several minutes, so launch it detached and watch it from a
+   backgrounded Bash call rather than blocking the session. **Watch for stalls,
+   not just completion** — a run can block indefinitely on an interactive
+   prompt, and a plain `until` loop would poll forever:
+
    ```bash
-   until podman exec <distro>-test grep -q '^DONE_EXIT:' /root/run.log; do sleep 20; done
+   watch_run() {   # $1=container  [$2=stall secs, default 180]  [$3=cap secs, default 1800]
+     local c=$1 stall=${2:-180} cap=${3:-1800}
+     local last=-1 quiet=0 waited=0 poll=20 n
+     while :; do
+       if podman exec "$c" grep -q '^DONE_EXIT:' /root/run.log 2>/dev/null; then
+         echo "FINISHED $(podman exec "$c" sh -c 'tail -1 /root/run.log')"; return 0
+       fi
+       n=$(podman exec "$c" sh -c 'wc -c < /root/run.log' 2>/dev/null || echo 0)
+       if [ "$n" = "$last" ]; then quiet=$((quiet+poll)); else quiet=0; last=$n; fi
+       if [ "$quiet" -ge "$stall" ]; then echo "STALLED: no output for ${quiet}s (log $n bytes)"; return 1; fi
+       waited=$((waited+poll))
+       if [ "$waited" -ge "$cap" ]; then echo "TIMEOUT: ${waited}s elapsed, still running"; return 2; fi
+       sleep "$poll"
+     done
+   }
+   watch_run <distro>-test
    ```
-   `DONE_EXIT:` is the script's own exit status: nonzero means the run aborted.
+   It measures **bytes**, not lines, so a progress bar redrawing one line with
+   `\r` still counts as alive — verified against both a real stall and a slow
+   healthy run. Three minutes of total silence means stuck; 30 minutes total is
+   the backstop. `DONE_EXIT:` is the script's own exit status: nonzero means
+   the run aborted.
+
+   **If it reports STALLED**, get the cause before killing anything — the
+   process tree names it immediately:
+   ```bash
+   podman exec <c> sh -c 'ps -eo pid,stat,args' | grep -iE 'debconf|whiptail|dialog|apt|dpkg|dnf|wget|curl'
+   podman exec <c> sh -c "grep -aoE '\[\*\] .*' /root/run.log | tail -1"   # step it died in
+   podman exec <c> sh -c 'tail -5 /root/run.log' | cat -v                    # escape codes made visible
+   ```
+   The usual cause is an interactive prompt with no one to answer it. A run
+   once hung on `python-sympy-doc`'s debconf dialog, reachable only because a
+   large dependency tree had installed `whiptail`, which switches debconf to
+   the blocking dialog frontend. The Debian script now exports
+   `DEBIAN_FRONTEND=noninteractive` to prevent it; Fedora needs no equivalent,
+   `dnf` has no debconf.
 
 4. **Read the outcome — the banner sequence is the primary signal.** Compare
    the banners that ran against the `msg '...'` calls in `auto()`; `msg()`
