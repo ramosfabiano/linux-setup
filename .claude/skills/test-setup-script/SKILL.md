@@ -1,33 +1,50 @@
 ---
 name: test-setup-script
-description: Test one of this repo's distro post-install setup scripts (fedora-44-setup.sh, debian-13-setup.sh) end-to-end in a disposable podman container, verify a fix after editing one, and clean up leaving no leftover containers or images. Use when asked to test, verify, validate, re-check or reproduce a bug in a setup script, or right after changing one.
+description: Test one of this repo's distro post-install setup scripts (fedora-44-setup.sh, debian-13-setup.sh, or any other <distro>-NN-setup.sh) end-to-end in a disposable podman container, verify a fix after editing one, and clean up leaving no leftover containers or images. Use when asked to test, verify, validate, re-check or reproduce a bug in a setup script, or right after changing one.
 globs:
 alwaysApply: false
 ---
 # Testing a distro setup script in a container
 
-These scripts are root-only, function-based bash: each `dnf`/`apt` step lives in
-its own function, and `auto()` runs them in a fixed order. Neither script sets
+This file is the whole procedure and applies to **every** distro. Only the
+package-manager details differ, and those live in one small file per distro.
+
+**Before starting, read the reference for the distro you're testing** — the
+agent must open it explicitly, it is not auto-loaded:
+
+| Distro | Script | Base image | Pkg mgr | Query installed | Reference |
+|---|---|---|---|---|---|
+| Fedora | `fedora-NN-setup.sh` | `registry.fedoraproject.org/fedora:NN` | `dnf` | `rpm -q <pkg>` | `.claude/skills/test-setup-script/references/fedora.md` |
+| Debian | `debian-NN-setup.sh` | `docker.io/library/debian:NN` | `apt` | `dpkg -l <pkg>` | `.claude/skills/test-setup-script/references/debian.md` |
+
+Adding a distro? See "Adding a new distro" at the bottom and copy
+`.claude/skills/test-setup-script/references/_template.md`.
+
+## Why running it beats reading it
+
+These scripts are root-only, function-based bash: each package step lives in
+its own function, and `auto()` runs them in a fixed order. No script sets
 `set -e` internally, so how failures behave depends entirely on how the script
 is *invoked*. Read "How the README actually invokes these" before interpreting
 any result.
 
-Containers are close enough to bare metal for package-manager work (dnf/apt
-installs, repo setup, flatpak, downloads + GPG verification). Two categories
-can't be judged from a container at all: systemd/D-Bus steps, and anything
+Containers are close enough to bare metal for package-manager work (installs,
+repo setup, flatpak, downloads + GPG verification). Two categories can't be
+judged from a container at all: systemd/D-Bus steps, and anything
 hardware-dependent — see "Expected non-bugs" and "What a container cannot tell
 you".
 
 ## How the README actually invokes these
 
-Test the script the way it will really be run. The README lines are:
+Test the script the way it will really be run. Every distro's README line has
+the same shape:
 
 ```bash
 sudo bash -c "$(wget -qO- .../<distro>-setup.sh) | tee log.txt"
 ```
 
-Both distros use this same form. Three consequences, all verified empirically
-— do not assume, they are counter-intuitive:
+Three consequences, all verified empirically — do not assume, they are
+counter-intuitive:
 
 1. **The script text is inlined by command substitution**, so `| tee log.txt`
    attaches to the script's *last line* only — `(return 2> /dev/null) || main`
@@ -52,16 +69,19 @@ still exiting `0`. `msg()` runs before every step, so under `-e` it is a
 recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
 `TERM` is unset, as under a bare `sudo`, cron, or a non-TTY SSH session.
 
+All three consequences follow from the **shared script skeleton** (`main` →
+menu → `auto()` → `msg()`/`ask_reboot`, plus the trailing
+`(return 2> /dev/null) || main`), not from any distro. They hold only as long
+as a script keeps that skeleton — see "Adding a new distro".
+
 ## Procedure
 
 1. **Record which images already exist, before pulling anything** — cleanup in
    step 8 must not delete an image the user already had:
    ```bash
-   podman images --format '{{.Repository}}:{{.Tag}}' | grep -iE 'fedora|debian'
+   podman images --format '{{.Repository}}:{{.Tag}}' | grep -iE 'fedora|debian|<distro>'
    ```
-   Then pick the matching base image:
-   - `fedora-NN-setup.sh` → `registry.fedoraproject.org/fedora:NN`
-   - `debian-NN-setup.sh` → `docker.io/library/debian:NN`
+   Then take the base image from the table above.
 
    (`podman` is assumed throughout; `docker` on this host is an alias for it.)
    Budget ~3 GB of pulls/installs per full run — cursor and code are ~1 GB
@@ -72,14 +92,16 @@ recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
    podman run -d --name <distro>-test <image> sleep infinity
    podman cp <script>.sh <distro>-test:/root/<script>.sh
    ```
-   Optionally `dnf -y install ncurses` and export `TERM=xterm` so `msg()`'s
-   `tput` works and the step banners render as they would on a real desktop;
-   without it every `msg()` logs a harmless `tput: command not found`.
-   Use `sleep infinity`, not the distro's init. Verified: neither base image
-   ships systemd (`rpm -q systemd` → *not installed*; `dpkg -l systemd` → *no
-   packages found*), and neither has `/sbin/init` or
+   Optionally install `ncurses` (see the distro reference for the exact
+   command) and export `TERM=xterm` so `msg()`'s `tput` works and the step
+   banners render as they would on a real desktop; without it every `msg()`
+   logs a harmless `tput: command not found`.
+
+   Use `sleep infinity`, not the distro's init. Verified for both current base
+   images: neither ships systemd (`rpm -q systemd` → *not installed*;
+   `dpkg -l systemd` → *no packages found*) and neither has `/sbin/init` or
    `/usr/lib/systemd/systemd`, so there is no PID 1 to boot and
-   `--systemd=always` buys nothing.
+   `--systemd=always` buys nothing. Re-check this for a new distro.
 
 3. **Run it the README way** (see above). Using the local working copy via
    `cat` is equivalent to the README's `wget -qO-` — both just inline the
@@ -119,9 +141,8 @@ recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
    ```bash
    grep -inE "error|fail|not found|no such|unable|cannot|denied|not installed|does not exist" run.log
    ```
-   Known noise to skip: the package name `perl-Error`, and dozens of `Failed
-   to connect to audit log, ignoring` lines from rpm scriptlets. Sort every
-   remaining hit into "expected container artifact" (below) or "real bug".
+   Sort every hit into "expected container artifact" (below, plus the distro
+   reference's own list) or "real bug".
 
    **Always confirm the run reached the end**, rather than assuming it did —
    compare the step banners that actually ran against the `msg '...'` calls in
@@ -131,17 +152,17 @@ recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
    grep -aoE '\[\*\] .*' run.log | sed 's/\x1b\[[0-9;]*m//g'
    grep -oE "msg '.*'" <script>.sh     # the expected sequence
    ```
-   A healthy full run ends with `[*] Done!` after all twelve steps. Anything
+   A healthy full run ends with `[*] Done!` having hit every step. Anything
    short of that is truncation — which, given consequence 2, will still have
    exited `0`. This check is what caught the old `-e` invocation stopping at
    `[*] Setting up firewall` and skipping the last six steps.
 
 6. **Confirm successes positively — absence of grep hits is weak evidence.**
-   The decisive checks are direct queries:
+   The decisive checks are direct queries (exact commands in the distro
+   reference):
    ```bash
-   podman exec <c> rpm -q <pkg>          # or: dpkg -l <pkg>
+   podman exec <c> <query-installed> <pkg>
    podman exec <c> flatpak list
-   podman exec <c> cat /etc/yum.repos.d/<name>.repo
    ```
    This is what actually proved the flatpaks installed, that `tuned`/
    `tuned-ppd` were present by default, and that apt auto-removed
@@ -170,21 +191,18 @@ recurring tripwire — and `tput` also fails with `No value for $TERM` whenever
 
 ## Expected non-bugs (container artifacts)
 
-Don't report these as findings:
+Distro-agnostic; the distro reference lists its own additions. Don't report
+these as findings:
 - `systemctl` / `firewall-cmd` → `System has not been booted with systemd as
   init system`, `Failed to connect to system scope bus`, `Failed to connect to
   socket /run/dbus/system_bus_socket`. No systemd/D-Bus PID 1.
 - `flatpak install` → `bwrap: Creating new namespace failed: Operation not
   permitted`. Nested sandboxing is restricted; the flatpak still installs
   (confirm with `flatpak list`).
-- `sed: can't read /etc/selinux/config` and `setenforce: SELinux is disabled`
-  from `install_qemu` — no SELinux config in the image.
 - `tput: command not found`, `xset: unable to open display`, `Failed to
   connect to audit log, ignoring`. Minimal image, no X, no audit subsystem.
 - `Unit sshd.service does not exist` / `pcscd.service does not exist` — those
   packages aren't in a minimal image.
-- `install_veracrypt` calling `sudo dnf` while already root: works (sudo is
-  installed) but is a real inconsistency in the script, just a harmless one.
 
 ## What a container cannot tell you
 
@@ -201,17 +219,18 @@ the host's `/proc` and `/sys`:
 
 ## Real bug patterns found this way
 
-- **Install-before-remove against a package-manager conflict.** Installing
-  `tlp` before removing what it conflicts with (`tuned`/`tuned-ppd`/
-  `power-profiles-daemon`, present by default on a Fedora GNOME install).
-  **Verify per package manager** — `dnf` hard-aborts the whole transaction,
-  while `apt` on Debian resolved the same `tlp` vs `power-profiles-daemon`
-  conflict by auto-removing the conflicting package and completing. Confirm in
-  a container before "fixing" something that isn't broken on that distro.
-- **Reused config/repo identifiers across unrelated integrations.** Two `dnf`
-  repo files (`cursor.repo`, `vscode.repo`) both declaring `[code]` as the
-  repo id — fragile even when it happens to still install. Give each a unique
-  id.
+Distro-specific instances live in each reference. The transferable shapes:
+
+- **Install-before-remove against a package-manager conflict**, and more
+  generally **the same fix does not port across package managers**. Installing
+  `tlp` before removing what it conflicts with is fatal under `dnf`, which
+  hard-aborts the whole transaction, but harmless under `apt`, which
+  auto-removed the conflicting package and completed. Always reproduce the
+  failure on *that* distro before "fixing" it — assuming the Fedora bug also
+  existed on Debian would have produced a pointless change to working code.
+- **Reused config/repo identifiers across unrelated integrations.** Two repo
+  files both claiming the same id — fragile even when it happens to still
+  install. Give each a unique id.
 - **Unguarded globs that don't expand when empty.**
   `for userpath in /home/*; do usermod -a -G libvirt,kvm $(basename $userpath); done`
   — with no match the glob stays literal and `usermod` fails with
@@ -219,3 +238,22 @@ the host's `/proc` and `/sys`:
   (a desktop already has a home directory) and only surfaces in the empty
   container; still worth guarding with `shopt -s nullglob` or a `[ -d ... ]`
   test.
+
+## Adding a new distro
+
+1. Copy `.claude/skills/test-setup-script/references/_template.md` to
+   `.claude/skills/test-setup-script/references/<distro>.md` and fill it in.
+   (Paths here are relative to the repo root, so they resolve the same whether
+   this file is read as the Claude Code skill or through the Cursor symlink.)
+2. Add a row to the table at the top of this file.
+3. **Check the script actually follows the shared skeleton** before trusting
+   this procedure on it: it needs `main` → menu → `auto()`, `msg()`,
+   `ask_reboot`, and the trailing `(return 2> /dev/null) || main`. If it
+   diverges, the whole "How the README actually invokes these" section may not
+   apply — re-derive it rather than assuming.
+4. **Check the distro is testable this way at all.** An image-based or atomic
+   distro (`rpm-ostree`, `transactional-update`) does not install packages
+   into a running container the way `dnf`/`apt` do, so a container run would
+   prove nothing. Say so rather than reporting a green run.
+5. Confirm the base image's init situation as in step 2 (no systemd → use
+   `sleep infinity`).

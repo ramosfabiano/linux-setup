@@ -31,3 +31,10 @@ also be referenced explicitly in a prompt with `@test-setup-script`.
 Either way, requires `podman` (or `docker`) locally to spin up the
 container.
 
+The shared procedure lives in
+[.claude/skills/test-setup-script/SKILL.md](.claude/skills/test-setup-script/SKILL.md),
+with one small file per distro under
+[.claude/skills/test-setup-script/references/](.claude/skills/test-setup-script/references/).
+To cover a new distro, copy `references/_template.md`, fill it in and add a row
+to the table at the top of `SKILL.md` — the procedure itself is not duplicated.
+
