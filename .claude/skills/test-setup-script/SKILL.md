@@ -1,10 +1,6 @@
 ---
-name: test-setup-script
-description: Test one of this repo's distro post-install setup scripts (e.g. fedora-44-setup.sh, debian-13-setup.sh) end-to-end in a disposable container, verify fixes after editing them, and leave no leftover containers or images. Use when asked to test, verify, validate, or re-check a setup script, or after fixing a bug in one.
-globs:
 alwaysApply: false
 ---
-
 # Testing a distro setup script in a container
 
 These scripts are root-only, function-based bash: each `dnf`/`apt` step lives in
@@ -71,6 +67,7 @@ exercised — see "Expected non-bugs" below.
    grep -inE "error|fail|not found|no such|unable|cannot|denied|not installed|does not exist" auto.log
    ```
    Sort each hit into "expected container limitation" (below) or "real bug."
+   On success, ask the user if they want to see the full script output log. If so, list it.
 
 7. **After fixing a real bug, re-verify in a *fresh* container**, not the one
    that already ran the broken version — leftover package/repo state can mask
