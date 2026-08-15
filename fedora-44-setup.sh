@@ -141,10 +141,12 @@ gpgkey=https://downloads.claude.ai/keys/claude-code.asc
 }
 
 disable_smart_card() {
-    systemctl stop pcscd.socket
-    systemctl stop pcscd
-    systemctl disable pcscd
-    systemctl mask pcscd
+    for unit in pcscd.socket pcscd.service; do
+        if systemctl cat "$unit" >/dev/null 2>&1; then
+            systemctl disable --now "$unit"
+            systemctl mask "$unit"
+        fi
+    done
 }
 
 install_qemu() {
