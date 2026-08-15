@@ -8,6 +8,8 @@
 set -e
 set -o pipefail
 
+export DEBIAN_FRONTEND=noninteractive
+
 setup_zram() {
     apt install zram-tools -y
     echo -e "ALGO=zstd\nPERCENT=15" | tee -a /etc/default/zramswap
@@ -64,7 +66,10 @@ setup_flatpak() {
 }
 
 install_packages() {
-    apt install --install-suggests gnome-software -y
+    # Not --install-suggests: that pulls the whole recursive Suggests closure
+    # (453 packages here, including the NVIDIA stack and snap). The flatpak
+    # plugin is the one suggested package actually wanted.
+    apt install gnome-software gnome-software-plugin-flatpak -y
     apt install intel-microcode firmware-linux firmware-linux-nonfree firmware-misc-nonfree dkms -y
 
     apt install openntpd vim net-tools rsync openssh-server flatpak \
