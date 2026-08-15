@@ -8,6 +8,7 @@
 set -e
 set -o pipefail
 
+# Noninteractive mode for apt.
 export DEBIAN_FRONTEND=noninteractive
 
 setup_zram() {
