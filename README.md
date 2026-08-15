@@ -15,10 +15,8 @@ Post-install setup scripts for personal use.
 
 ## Testing changes
 
-Before relying on a change to one of these scripts, test it end-to-end in a
-disposable container rather than on real hardware. The procedure (pull a
-matching base image, run the script's `auto()` sequence, triage the log,
-re-verify fixes in a fresh container, clean up fully) is written up as a
+To test changes to one of these scripts, test it end-to-end in a
+disposable container rather than on real hardware. The procedure is written up as a
 shared skill/rule usable from both Claude Code and Cursor:
 [.claude/skills/test-setup-script/SKILL.md](.claude/skills/test-setup-script/SKILL.md)
 (symlinked at [.cursor/rules/test-setup-script.mdc](.cursor/rules/test-setup-script.mdc)).
