@@ -38,6 +38,5 @@ also be referenced explicitly in a prompt with `@test-setup-script`.
 
 Keep in mind that some of
 the script's functions cannot be tested in a container. Functions that cannot
-work there (zram, firewall, TLP, …) are skipped entirely — including work inside
-them that a container could otherwise check. A real machine or a full VM
-is the only complete test.
+work there (zram, firewall, TLP, …) are skipped entirely. 
+A real machine or a full VM is the only complete test.
