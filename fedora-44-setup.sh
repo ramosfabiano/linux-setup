@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Fail fast: any failing command ends the run. These scripts are not
+# idempotent and are meant to be run once against a clean install; there
+# is no recovery or resuming. pipefail covers the pipelines inside these
+# functions (wget | gpg, echo | sha1sum --check), so a failing first stage is
+# not hidden by a succeeding second one.
+set -e
+set -o pipefail
+
 setup_zram() {
     # n/a on Fedora: zram swap is configured out of the box by zram-generator
     # (zram-generator-defaults), so there is nothing to set up here.
