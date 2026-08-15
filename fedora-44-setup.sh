@@ -142,8 +142,12 @@ install_qemu() {
     setenforce 0
 
     dnf -y install bridge-utils libvirt virt-install qemu-kvm virt-viewer virt-manager spice-webdavd spice-gtk-tools swtpm.x86_64 edk2-ovmf  
-    for userpath in /home/*; do
-        usermod -a -G libvirt,kvm $(basename $userpath)
+    # Real login accounts, not /home/* directory names: an empty /home would
+    # leave the glob literal (usermod: user '*' does not exist), and entries
+    # like lost+found are not users. 1000-60000 is UID_MIN..UID_MAX from
+    # /etc/login.defs, which excludes system accounts such as libvirt-qemu.
+    for user in $(awk -F: '$3>=1000 && $3<=60000 {print $1}' /etc/passwd); do
+        usermod -a -G libvirt,kvm "$user"
     done
     
     # still required?

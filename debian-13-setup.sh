@@ -5,8 +5,13 @@ setup_zram() {
     echo -e "ALGO=zstd\nPERCENT=15" | tee -a /etc/default/zramswap
     systemctl restart zramswap
     swapon -s
-    sed -i '/^\/dev\/mapper\/.*vg-swap/s/^/#/' /etc/fstab
-    swapoff /dev/dm-2
+    # Stop using the installer's on-disk swap. Comment out any uncommented
+    # swap line whatever its device syntax (UUID=/LABEL=//dev/...), then 
+    # switch off whichever non-zram swap is really active
+    sed -i -E '/^[^#].*[[:space:]]swap[[:space:]]/s/^/#/' /etc/fstab
+    for dev in $(awk 'NR>1 && $1 !~ /zram/ {print $1}' /proc/swaps); do
+        swapoff "$dev"
+    done
     mount -a
     swapon -s
 }
@@ -163,9 +168,11 @@ install_qemu() {
         virtinst qemu-utils virt-viewer spice-client-gtk gir1.2-spice* ebtables swtpm swtpm-tools ovmf virtiofsd -y
     virsh net-autostart default
     modprobe vhost_net    
-    for userpath in /home/*; do
-        usermod -a -G libvirt,kvm $(basename $userpath)
-    done    
+    # Real login accounts. 1000-60000 is UID_MIN..UID_MAX from
+    # /etc/login.defs, which excludes system accounts such as libvirt-qemu.
+    for user in $(awk -F: '$3>=1000 && $3<=60000 {print $1}' /etc/passwd); do
+        usermod -a -G libvirt,kvm "$user"
+    done
 }
 
 setup_camera() {
