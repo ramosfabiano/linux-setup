@@ -1,6 +1,6 @@
 ---
 name: test-setup-script
-description: Test one of this repo's distro post-install setup scripts (fedora-44-setup.sh, debian-13-setup.sh, or any other <distro>-NN-setup.sh) end-to-end in a disposable podman container, verify a fix after editing one, and clean up leaving no leftover containers or images. Use when asked to test, verify, validate, re-check or reproduce a bug in a setup script, or right after changing one.
+description: Test one of this repo's distro post-install setup scripts (<distro>-NN-setup.sh) end-to-end in a disposable podman container.
 globs:
 alwaysApply: false
 ---
