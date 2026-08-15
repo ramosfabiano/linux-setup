@@ -59,8 +59,8 @@ install_packages() {
     apt install --install-suggests gnome-software -y
     apt install intel-microcode firmware-linux firmware-linux-nonfree firmware-misc-nonfree dkms -y
 
-    apt install openntpd vim net-tools rsync openssh-server flatpak vim net-tools \
-        vim build-essential ffmpeg libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
+    apt install openntpd vim net-tools rsync openssh-server flatpak \
+        build-essential ffmpeg libavcodec-extra gstreamer1.0-* gstreamer1.0-plugins* \
         gnome-shell-extension-appindicator tigervnc-viewer dnsutils \
 	 	astyle inxi vlc texlive-extra-utils graphicsmagick-imagemagick-compat  \
         python3-pip pipx apt-transport-https ca-certificates curl wget \
@@ -187,6 +187,9 @@ setup_camera() {
 setup_tlp() {
     apt install tlp tlp-rdw smartmontools -y
     apt remove power-profiles-daemon -y
+    # Drop-in rather than overwriting /etc/tlp.conf, which is 574 lines of
+    # documented defaults shipped by the package. The packaged file leaves
+    # every setting commented out, so it overrides nothing here.
     echo '
 TLP_ENABLE=1
 TLP_AUTO_SWITCH=1
@@ -202,7 +205,7 @@ USB_EXCLUDE_AUDIO=1
 USB_EXCLUDE_PHONE=1
 USB_EXCLUDE_BTUSB=1
 RESTORE_THRESHOLDS_ON_BAT=1
-' > /etc/tlp.conf 
+' > /etc/tlp.d/99-local.conf
     systemctl enable tlp.service
     systemctl start tlp.service
     systemctl mask systemd-rfkill.service systemd-rfkill.socket
@@ -224,7 +227,6 @@ ask_reboot() {
 }
 
 msg() {
-    sleep 5
     tput setaf 2
     echo "[*] $1"
     tput sgr0

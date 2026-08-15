@@ -37,8 +37,11 @@ setup_flatpak() {
 }
 
 install_packages() {
-    dnf -y install flatpak vim thunderbird git \
-        vlc cmake gcc-c++ boost-devel flatpak thunderbird vim  \
+    # No thunderbird here: setup_flatpak installs the flatpak and removes the
+    # rpm, so listing it meant downloading and installing ~360 MB purely to
+    # delete it a step later.
+    dnf -y install flatpak vim git \
+        vlc cmake gcc-c++ boost-devel \
         dnsutils java-latest-openjdk astyle  \
         thermald curl wget liberation*fonts* \
         python3-pip pipx xsel firewall-config \
@@ -142,9 +145,7 @@ install_qemu() {
     setenforce 0
 
     dnf -y install bridge-utils libvirt virt-install qemu-kvm virt-viewer virt-manager spice-webdavd spice-gtk-tools swtpm.x86_64 edk2-ovmf  
-    # Real login accounts, not /home/* directory names: an empty /home would
-    # leave the glob literal (usermod: user '*' does not exist), and entries
-    # like lost+found are not users. 1000-60000 is UID_MIN..UID_MAX from
+    # Real login accounts. 1000-60000 is UID_MIN..UID_MAX from
     # /etc/login.defs, which excludes system accounts such as libvirt-qemu.
     for user in $(awk -F: '$3>=1000 && $3<=60000 {print $1}' /etc/passwd); do
         usermod -a -G libvirt,kvm "$user"
@@ -166,6 +167,9 @@ setup_camera() {
 setup_tlp() {
     dnf -y remove tuned tuned-ppd power-profiles-daemon
     dnf -y install tlp tlp-rdw smartmontools
+    # Drop-in rather than overwriting /etc/tlp.conf, which is 574 lines of
+    # documented defaults shipped by the package. The packaged file leaves
+    # every setting commented out, so it overrides nothing here.
     echo '
 TLP_ENABLE=1
 TLP_AUTO_SWITCH=1
@@ -181,7 +185,7 @@ USB_EXCLUDE_AUDIO=1
 USB_EXCLUDE_PHONE=1
 USB_EXCLUDE_BTUSB=1
 RESTORE_THRESHOLDS_ON_BAT=1
-' > /etc/tlp.conf 
+' > /etc/tlp.d/99-local.conf
     systemctl enable tlp.service
     systemctl start tlp.service
     systemctl mask systemd-rfkill.service systemd-rfkill.socket
@@ -203,7 +207,6 @@ ask_reboot() {
 }
 
 msg() {
-    sleep 5
     tput setaf 2
     echo "[*] $1"
     tput sgr0
