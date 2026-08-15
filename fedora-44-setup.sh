@@ -67,13 +67,13 @@ setup_firewall() {
 }
 
 install_veracrypt() {
-    export VC_VERSION="1.26.24"
+    export VC_VERSION="1.26.29"
     cd /tmp
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm.sig
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm.sig
     wget https://www.idrix.fr/VeraCrypt/VeraCrypt_PGP_public_key.asc
     gpg --import VeraCrypt_PGP_public_key.asc
-    gpg --verify veracrypt-$VC_VERSION-Fedora-40-x86_64.rpm.sig
+    gpg --verify veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm.sig
     sudo dnf -y install ./veracrypt*.rpm
     rm -f VeraCrypt* veracrypt*  
 }
@@ -81,7 +81,7 @@ install_veracrypt() {
 install_cursor() {
     rpm --import https://downloads.cursor.com/keys/anysphere.asc
     echo '
-[code]
+[cursor]
 name=Cursor
 baseurl=https://downloads.cursor.com/yumrepo
 enabled=1
@@ -148,8 +148,8 @@ setup_camera() {
 }
 
 setup_tlp() {
+    dnf -y remove tuned tuned-ppd power-profiles-daemon
     dnf -y install tlp tlp-rdw smartmontools
-    dnf -y remove power-profiles-daemon
     echo '
 TLP_ENABLE=1
 TLP_AUTO_SWITCH=1
