@@ -271,7 +271,7 @@ auto() {
     install_veracrypt
     msg 'Installing coding tools'
     install_cursor
-    install_vscode
+    #install_vscode
     install_claude
     msg 'Disabling smart card'
     disable_smart_card
