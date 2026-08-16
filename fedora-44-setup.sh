@@ -21,13 +21,20 @@ setup_locale() {
 }
 
 update_system() {
-    dnf -y update
+    # distro-sync, not update: langpack subpackages carry exact-version
+    # dependencies on their base package (dnsmasq-langpack requires
+    # dnsmasq = <version>, libreoffice-langpack-pt-BR requires
+    # libreoffice-core = <version>). A plain update can move the base package
+    # without its langpack and RPM then refuses the whole transaction.
+    # distro-sync brings both to the repo version together; --refresh avoids
+    # deciding on stale metadata.
+    dnf -y --refresh distro-sync
 }
 
 install_external_repos() {
     dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
     dnf -y install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-    dnf -y update
+    dnf -y --refresh distro-sync
 }
 
 setup_flatpak() {

@@ -252,6 +252,12 @@ drivers install cleanly but prove nothing about the hardware. And because the
 container shares the host's `/proc` and `/sys`, any hardware-facing output can
 look convincingly real while describing the **host**.
 
+Locale-dependent failures are invisible here too: a container carries one
+langpack (`glibc-minimal-langpack`) where a real desktop install carries a
+full set. Fedora's `*-langpack-*` subpackages pin their base package to an
+exact version, so a plain `dnf update` can break the transaction on a real
+machine in a way no container run will ever reproduce.
+
 ## Real bug patterns
 
 - **A fix does not port across package managers.** Installing `tlp` before
