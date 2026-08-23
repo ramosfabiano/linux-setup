@@ -199,6 +199,8 @@ RESTORE_THRESHOLDS_ON_BAT=1
 ' > /etc/tlp.d/99-local.conf
     systemctl enable tlp.service
     systemctl start tlp.service
+    systemctl enable tlp-pd.service
+    systemctl start tlp-pd.service
     systemctl mask systemd-rfkill.service systemd-rfkill.socket
     tlp-stat -s
 }
