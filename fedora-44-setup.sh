@@ -21,7 +21,8 @@ setup_locale() {
 }
 
 update_system() {
-    dnf -y update
+    dnf -y distro-sync
+    dnf -y upgrade
 }
 
 install_external_repos() {
