@@ -141,6 +141,36 @@ gpgkey=https://downloads.claude.ai/keys/claude-code.asc
     dnf -y install claude-code
 }
 
+# Idempotent exception: resolve the latest stable GitHub release and
+# (re)install the .rpm so a second run upgrades to whatever is current.
+install_voxtype() {
+    # https://voxtype.io/docs/
+    local api='https://api.github.com/repos/peteonrails/voxtype/releases/latest'
+    local url pkg
+    url=$(curl -fsSL "$api" | python3 -c '
+import json, sys
+release = json.load(sys.stdin)
+for asset in release["assets"]:
+    name = asset["name"]
+    if name.startswith("voxtype-") and name.endswith(".x86_64.rpm"):
+        print(asset["browser_download_url"])
+        break
+else:
+    sys.exit("no x86_64 .rpm asset in latest voxtype release")
+')
+    pkg="/tmp/$(basename "$url")"
+    curl -fL "$url" -o "$pkg"
+    dnf -y install "$pkg"
+    rm -f "$pkg"
+
+    dnf -y install wtype wl-clipboard libnotify pipewire-alsa
+
+    # Evdev hotkeys need the input group; log out/in afterwards.
+    for user in $(awk -F: '$3>=1000 && $3<=60000 {print $1}' /etc/passwd); do
+        usermod -aG input "$user"
+    done
+}
+
 disable_smart_card() {
     for unit in pcscd.socket pcscd.service; do
         if systemctl cat "$unit" >/dev/null 2>&1; then
@@ -293,6 +323,8 @@ auto() {
     install_cursor
     #install_vscode
     install_claude
+    msg 'Installing voxtype'
+    install_voxtype
     msg 'Disabling smart card'
     disable_smart_card
     msg 'Installing qemu'

@@ -22,8 +22,23 @@ Do not remove `set -e` to finish a half-run, and do not add idempotency guards b
 
 ## Testing
 
-When asked to test a `<distro>-NN-setup.sh` script, **read and follow** [`.claude/skills/test-setup-script/SKILL.md`](.claude/skills/test-setup-script/SKILL.md) (same text lives at [`.cursor/rules/test-setup-script.mdc`](.cursor/rules/test-setup-script.mdc)).
+After **any** edit to a `<distro>-NN-setup.sh` (or a generated `*-test.sh`
+used for validation), do **one** of the following before treating the work
+as done:
 
-**Everything runs inside a disposable podman container — never on the host.** That includes the setup script, the generated test copy, and any check that demonstrates a failure mode. `systemctl` would hit the real system bus, `/proc/swaps` is not namespaced so `swapoff` sees host devices, and `mount -a` acts on the real fstab.
+1. **Ask** whether to run the container test now (Debian, Fedora, or both), or
+2. If the user already asked to test / said to proceed — **read and follow**
+   [`.claude/skills/test-setup-script/SKILL.md`](.claude/skills/test-setup-script/SKILL.md)
+   (same text: [`.cursor/rules/test-setup-script.mdc`](.cursor/rules/test-setup-script.mdc)).
 
-A container run with untestable functions stubbed is not full validation. Name every skipped function in the report.
+Do **not** treat `bash -n`, grepping the script, or a host-side dry-run as
+a substitute for that skill. `bash -n` only checks syntax.
+
+**Everything runs inside a disposable podman container — never on the host.**
+That includes the setup script, the generated test copy, and any check that
+demonstrates a failure mode. `systemctl` would hit the real system bus,
+`/proc/swaps` is not namespaced so `swapoff` sees host devices, and
+`mount -a` acts on the real fstab.
+
+A container run with untestable functions stubbed is not full validation.
+Name every skipped function in the report.

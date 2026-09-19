@@ -170,6 +170,36 @@ install_claude() {
     apt install claude-code -y
 }
 
+# Idempotent exception: resolve the latest stable GitHub release and
+# (re)install the .deb so a second run upgrades to whatever is current.
+install_voxtype() {
+    # https://voxtype.io/docs/
+    local api='https://api.github.com/repos/peteonrails/voxtype/releases/latest'
+    local url pkg
+    url=$(curl -fsSL "$api" | python3 -c '
+import json, sys
+release = json.load(sys.stdin)
+for asset in release["assets"]:
+    name = asset["name"]
+    if name.startswith("voxtype_") and name.endswith("_amd64.deb"):
+        print(asset["browser_download_url"])
+        break
+else:
+    sys.exit("no amd64 .deb asset in latest voxtype release")
+')
+    pkg="/tmp/$(basename "$url")"
+    curl -fL "$url" -o "$pkg"
+    apt install -y "$pkg"
+    rm -f "$pkg"
+
+    apt install -y wtype wl-clipboard libnotify-bin pipewire-alsa
+
+    # Evdev hotkeys need the input group; log out/in afterwards.
+    for user in $(awk -F: '$3>=1000 && $3<=60000 {print $1}' /etc/passwd); do
+        usermod -aG input "$user"
+    done
+}
+
 disable_smart_card() {
     for unit in pcscd.socket pcscd.service; do
         if systemctl cat "$unit" >/dev/null 2>&1; then
@@ -316,6 +346,8 @@ auto() {
     install_cursor
     #install_vscode
     install_claude
+    msg 'Installing voxtype'
+    install_voxtype
     msg 'Disabling smart card'
     disable_smart_card
     msg 'Installing qemu'

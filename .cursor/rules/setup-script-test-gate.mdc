@@ -1,0 +1,9 @@
+---
+description: After editing distro setup scripts, ask to run the container test skill (or run it if already requested).
+globs: "*-setup.sh"
+alwaysApply: false
+---
+
+If you modified a matching file in this turn, before finishing: ask whether
+to run `.claude/skills/test-setup-script/SKILL.md`, unless the user already
+asked to test — then follow that skill immediately. `bash -n` is not enough.

@@ -1,6 +1,9 @@
 ---
 name: test-setup-script
-description: Test one of this repo's distro post-install setup scripts (<distro>-NN-setup.sh) end-to-end in a disposable podman container.
+description: >-
+  End-to-end container test for <distro>-NN-setup.sh (podman). Use when the
+  user asks to test a setup script, OR after editing one when they approve
+  running the test. Never run the script on the host.
 globs:
 alwaysApply: false
 ---
