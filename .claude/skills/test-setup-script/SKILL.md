@@ -240,6 +240,13 @@ That is why step 7 requires naming them in every report.
    green run is never mistaken for full validation. Offer the full log rather
    than pasting it — these run to several thousand lines.
 
+   **Then delete host-side test artifacts** — the generated stubbed script and
+   any copied logs. They are throwaways for one run; leave them and the next
+   edit pollutes `git status`:
+   ```bash
+   rm -f <script>-test.sh run.log ./*-test-run.log
+   ```
+
 ## Expected non-bugs (container artifacts)
 
 With the untestable functions skipped, most environmental noise is gone.
