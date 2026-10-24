@@ -61,6 +61,7 @@ setup_flatpak() {
     #flatpak install flathub md.obsidian.Obsidian -y
     flatpak install org.mozilla.firefox -y
     flatpak install org.mozilla.thunderbird_esr -y
+    #flatpak install io.github.bhack.mini-eq -y
 
     apt remove firefox-esr -y
     apt remove thunderbird -y
