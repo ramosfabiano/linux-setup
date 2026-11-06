@@ -7,7 +7,7 @@ Personal post-install setup scripts. Humans use [README.md](README.md).
 | Distro | File |
 |---|---|
 | Debian 13 | `debian-13-setup.sh` |
-| Fedora 44 | `fedora-44-setup.sh` |
+| Fedora 45 | `fedora-45-setup.sh` |
 
 Root-only, function-based bash. Each package step is a function; `auto()` runs them in a fixed order. File-scope `set -e` and `set -o pipefail` enforce the contract below. The last line is `(return 2> /dev/null) || main`, so a wget-inlined run starts the interactive menu, not `auto()` directly.
 

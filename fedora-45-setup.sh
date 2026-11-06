@@ -62,7 +62,7 @@ install_packages() {
         gnome-shell-extension-system-monitor
 
     dnf -y install faad2 flac lame libde265 x264 x265 --allowerasing
-    dnf -y install ffmpeg-libs libva 
+    dnf -y install ffmpeg-libs libva --allowerasing
     dnf -y install libva-intel-media-driver intel-media-driver --allowerasing
     dnf -y install libva-intel-driver    
 }
@@ -76,7 +76,9 @@ setup_fonts() {
     wget https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
     echo "0cd8fc72921f917ce27b2e639da6fe25eaa736b4  msttcore-fonts-installer-2.6-1.noarch.rpm" | sha1sum --check
     echo "55d7f3a86533225634ff3ea2384b4356d9665a29cc7eeacff16602a1714afbb4  msttcore-fonts-installer-2.6-1.noarch.rpm" | sha256sum --check
-    rpm -i --nodigest msttcore-fonts-installer-2.6-1.noarch.rpm
+    # Unsigned rpm; Fedora 45's rpm enforces signatures by default. The two
+    # checksums above are the integrity check.
+    rpm -i --nodigest --nosignature msttcore-fonts-installer-2.6-1.noarch.rpm
     rm -f msttcore-fonts-installer-2.6-1.noarch.rpm
 }
 
@@ -93,12 +95,16 @@ setup_firewall() {
 
 install_veracrypt() {
     export VC_VERSION="1.26.29"
+    # VeraCrypt does not publish an RPM per Fedora release; one build serves
+    # several. As of 1.26.29 the newest is the Fedora-44 build, used on 45.
+    export VC_FEDORA="44"
+    local rpm="veracrypt-$VC_VERSION-Fedora-$VC_FEDORA-x86_64.rpm"
     cd /tmp
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm
-    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm.sig
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/$rpm
+    wget https://launchpad.net/veracrypt/trunk/$VC_VERSION/+download/$rpm.sig
     wget https://www.idrix.fr/VeraCrypt/VeraCrypt_PGP_public_key.asc
     gpg --import VeraCrypt_PGP_public_key.asc
-    gpg --verify veracrypt-$VC_VERSION-Fedora-44-x86_64.rpm.sig
+    gpg --verify $rpm.sig
     sudo dnf -y install ./veracrypt*.rpm
     rm -f VeraCrypt* veracrypt*  
 }

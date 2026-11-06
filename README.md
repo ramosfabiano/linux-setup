@@ -17,7 +17,7 @@ run fails, fix the cause and start again from a clean install.
 `sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/debian-13-setup.sh)"`
 
 
-## Fedora 44
+## Fedora 45
 
-`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-44-setup.sh)"`
+`sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/ramosfabiano/linux-setup/main/fedora-45-setup.sh)"`
 
